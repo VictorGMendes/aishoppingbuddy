@@ -5,7 +5,11 @@ import com.aishoppingbuddy.model.Funcionario;
 import com.aishoppingbuddy.repository.FuncionarioRepository;
 import com.aishoppingbuddy.repository.ParceiroRepository;
 import com.aishoppingbuddy.service.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("aishoppingbuddy/api/funcionario")
 @SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = "Funcionário", description = "Funcionário de um Parceiro")
 public class FuncionarioController {
     
     Logger log = LoggerFactory.getLogger(getClass());
@@ -42,12 +47,29 @@ public class FuncionarioController {
     TokenService tokenService;
     
     @GetMapping
+    @Operation(
+            summary = "Listar funcionários",
+            description = "Retorna todos os funcionários cadastrados"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Funcionários listados com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public List<Funcionario> load() {
         log.info("exibindo funcionarios");
         return funcionarioRepository.findAll();
     }
 
     @GetMapping("{id}")
+    @Operation(
+            summary = "Detalhar funcionário",
+            description = "Busca um funcionário por id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Funcionário detalhado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Não foi achado Funcionário com esse ID"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public ResponseEntity<Funcionario> index(@PathVariable Long id) {
         log.info("buscando funcionario " + id);
         var result = funcionarioRepository.findById(id)
@@ -56,6 +78,16 @@ public class FuncionarioController {
     }
 
     @PostMapping("cadastrar/{idParceiro}")
+    @Operation(
+            summary = "Cadastro funcionário",
+            description = "Cadastra um funcionário pelo id de um Parceiro"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Funcionário cadastrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Não foi achado Parceiro com esse ID"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou faltando"),
+            @ApiResponse(responseCode = "403", description = "Id do Parceiro inválido")
+    })
     public ResponseEntity<Object> cadastro(@PathVariable Long idParceiro, @RequestBody @Valid Funcionario funcionario) {
         log.info("cadastrando funcionario");
         var parceiroResult = parceiroRepository.findById(idParceiro)
@@ -69,6 +101,14 @@ public class FuncionarioController {
 
     @CrossOrigin
     @PostMapping("login")
+    @Operation(
+            summary = "Login de funcionário",
+            description = "Realiza o login de um funcionário"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Login efetuado com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Dados inválidos")
+    })
     public ResponseEntity<Object> login(@RequestBody Credencial credencial) {
         manager.authenticate(credencial.toAuthentication());
         log.info("autenticado");
@@ -77,6 +117,15 @@ public class FuncionarioController {
     }
 
     @DeleteMapping("{id}")
+    @Operation(
+            summary = "Deletar funcionário",
+            description = "Deleta um funcionário por id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Funcionário deletado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Não foi achado Funcionário com esse ID"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public ResponseEntity<Funcionario> destroy(@PathVariable Long id){
         log.info("deletando funcionario " + id);
         var result = funcionarioRepository.findById(id)
@@ -86,6 +135,16 @@ public class FuncionarioController {
     }
 
     @PutMapping("{id}")
+    @Operation(
+            summary = "Editar funcionário",
+            description = "Editar um funcionário por id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Funcionário atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou faltando"),
+            @ApiResponse(responseCode = "404", description = "Não foi achado Funcionário com esse ID"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public ResponseEntity<Funcionario> update(@PathVariable Long id, @RequestBody @Valid Funcionario funcionario){
         log.info("atualizando funcionario "+id);
         var result = funcionarioRepository.findById(id)
