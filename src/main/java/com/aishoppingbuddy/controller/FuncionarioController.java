@@ -56,7 +56,7 @@ public class FuncionarioController {
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
     public List<Funcionario> load() {
-        log.info("exibindo funcionarios");
+        log.info("exibindo todos funcionarios");
         return funcionarioRepository.findAll();
     }
 
@@ -71,9 +71,10 @@ public class FuncionarioController {
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
     public ResponseEntity<Funcionario> index(@PathVariable Long id) {
-        log.info("buscando funcionario " + id);
+        log.info("buscando funcionario por id: " + id);
         var result = funcionarioRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionario não Encontrado"));
+        log.info("achado funcionario de id: " + id);
         return ResponseEntity.ok(result);
     }
 
@@ -90,12 +91,14 @@ public class FuncionarioController {
     })
     public ResponseEntity<Object> cadastro(@PathVariable Long idParceiro, @RequestBody @Valid Funcionario funcionario) {
         log.info("cadastrando funcionario");
+        log.info("buscando parceiro de id: "+idParceiro);
         var parceiroResult = parceiroRepository.findById(idParceiro)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Parceiro não Encontrado"));
-        log.info("achado parceiro "+parceiroResult.getId());
+        log.info("achado parceiro de id: "+parceiroResult.getId());
         funcionario.setParceiro(parceiroResult);
         funcionario.setSenha(encoder.encode(funcionario.getSenha()));
         funcionarioRepository.save(funcionario);
+        log.info("cadastrado funcionario: (nome:"+funcionario.getNome()+", email:"+funcionario.getEmail()+")");
         return ResponseEntity.status(HttpStatus.CREATED).body(funcionario);
     }
 
@@ -111,8 +114,9 @@ public class FuncionarioController {
     })
     public ResponseEntity<Object> login(@RequestBody Credencial credencial) {
         manager.authenticate(credencial.toAuthentication());
-        log.info("autenticado");
+        log.info("credenciais autenticadas");
         var token = tokenService.generateToken(credencial);
+        log.info("gerado token");
         return ResponseEntity.ok(token);
     }
 
@@ -127,10 +131,13 @@ public class FuncionarioController {
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
     public ResponseEntity<Funcionario> destroy(@PathVariable Long id){
-        log.info("deletando funcionario " + id);
+        log.info("deletando funcionario de id: "+id);
+        log.info("buscando funcionario de id: " + id);
         var result = funcionarioRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionario não Encontrado"));
+        log.info("achado funcionario de id: " + id);
         funcionarioRepository.delete(result);
+        log.info("deletado funcionario de id: " + id);
         return ResponseEntity.noContent().build();
     }
 
@@ -146,13 +153,16 @@ public class FuncionarioController {
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
     public ResponseEntity<Funcionario> update(@PathVariable Long id, @RequestBody @Valid Funcionario funcionario){
-        log.info("atualizando funcionario "+id);
+        log.info("atualizando funcionario de id: "+id);
+        log.info("buscando funcionario de id: "+id);
         var result = funcionarioRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionario não Encontrado"));
+        log.info("achado funcionario de id: "+id);
         funcionario.setSenha(encoder.encode(funcionario.getPassword()));
         funcionario.setId(id);
         funcionario.setParceiro(result.getParceiro());
         funcionarioRepository.save(funcionario);
+        log.info("atualizado funcionario (id:"+funcionario.getId()+", nome:"+funcionario.getNome()+", email:"+funcionario.getEmail()+")");
         return ResponseEntity.ok(funcionario);
     }
     
