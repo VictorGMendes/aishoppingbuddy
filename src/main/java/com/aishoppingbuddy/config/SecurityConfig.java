@@ -28,6 +28,7 @@ public class SecurityConfig {
                     .requestMatchers(HttpMethod.POST,"/aishoppingbuddy/api/funcionario/cadastrar/{idParceiro}").permitAll()
                     .requestMatchers(HttpMethod.POST,"/aishoppingbuddy/api/funcionario/login").permitAll()
                     .requestMatchers(HttpMethod.POST,"/aishoppingbuddy/api/parceiro").permitAll()
+                    .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .anyRequest().authenticated()
                 .and()
                 .csrf().disable()
