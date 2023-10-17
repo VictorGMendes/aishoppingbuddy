@@ -5,6 +5,7 @@ import com.aishoppingbuddy.model.Funcionario;
 import com.aishoppingbuddy.repository.FuncionarioRepository;
 import com.aishoppingbuddy.repository.ParceiroRepository;
 import com.aishoppingbuddy.service.TokenService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("aishoppingbuddy/api/funcionario")
+@SecurityRequirement(name = "Bearer Authentication")
 public class FuncionarioController {
     
     Logger log = LoggerFactory.getLogger(getClass());
@@ -40,7 +42,10 @@ public class FuncionarioController {
     TokenService tokenService;
     
     @GetMapping
-    public List<Funcionario> load() { return funcionarioRepository.findAll(); }
+    public List<Funcionario> load() {
+        log.info("exibindo funcionarios");
+        return funcionarioRepository.findAll();
+    }
 
     @GetMapping("{id}")
     public ResponseEntity<Funcionario> index(@PathVariable Long id) {
@@ -50,7 +55,6 @@ public class FuncionarioController {
         return ResponseEntity.ok(result);
     }
 
-    @CrossOrigin
     @PostMapping("cadastrar/{idParceiro}")
     public ResponseEntity<Object> cadastro(@PathVariable Long idParceiro, @RequestBody @Valid Funcionario funcionario) {
         log.info("cadastrando funcionario");

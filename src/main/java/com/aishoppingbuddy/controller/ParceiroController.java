@@ -5,6 +5,7 @@ import com.aishoppingbuddy.model.Produto;
 import com.aishoppingbuddy.model.Recomendacao;
 import com.aishoppingbuddy.model.Transacao;
 import com.aishoppingbuddy.repository.*;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("aishoppingbuddy/api/parceiro")
+@SecurityRequirement(name = "Bearer Authentication")
 public class ParceiroController {
 
     Logger log = LoggerFactory.getLogger(getClass());

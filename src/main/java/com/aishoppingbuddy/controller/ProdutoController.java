@@ -5,6 +5,7 @@ import com.aishoppingbuddy.repository.FuncionarioRepository;
 import com.aishoppingbuddy.repository.ParceiroRepository;
 import com.aishoppingbuddy.repository.ProdutoRepository;
 import com.aishoppingbuddy.service.TokenService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("aishoppingbuddy/api/produto")
+@SecurityRequirement(name = "Bearer Authentication")
 public class ProdutoController {
     
     Logger log = LoggerFactory.getLogger(getClass());

@@ -6,6 +6,7 @@ import com.aishoppingbuddy.repository.ProdutoRepository;
 import com.aishoppingbuddy.repository.RecomendacaoRepository;
 import com.aishoppingbuddy.repository.UsuarioRepository;
 import com.aishoppingbuddy.service.TokenService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("aishoppingbuddy/api/recomendacao")
+@SecurityRequirement(name = "Bearer Authentication")
 public class RecomendacaoController {
 
     @Autowired

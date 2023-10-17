@@ -3,6 +3,7 @@ package com.aishoppingbuddy.controller;
 import com.aishoppingbuddy.model.Usuario;
 import com.aishoppingbuddy.repository.UsuarioRepository;
 import com.aishoppingbuddy.service.TokenService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("aishoppingbuddy/api/usuario")
+@SecurityRequirement(name = "Bearer Authentication")
 public class UsuarioController {
     
     Logger log = LoggerFactory.getLogger(getClass());

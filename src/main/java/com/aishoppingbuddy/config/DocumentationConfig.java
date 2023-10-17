@@ -22,7 +22,7 @@ public class DocumentationConfig {
                 )
 
                 .components(new Components()
-                        .addSecuritySchemes("bearer-key",
+                        .addSecuritySchemes("Bearer Authentication",
                                 new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer")
                                         .bearerFormat("JWT")));
     }
