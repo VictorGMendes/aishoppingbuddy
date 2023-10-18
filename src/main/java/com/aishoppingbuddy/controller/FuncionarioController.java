@@ -69,14 +69,14 @@ public class FuncionarioController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Funcionário detalhado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Não foi achado Funcionário com esse ID"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Funcionário com esse ID"),
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
     public ResponseEntity<Funcionario> index(@PathVariable Long id) {
         log.info("buscando funcionario por id: " + id);
         var result = funcionarioRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionario não Encontrado"));
-        log.info("achado funcionario de id: " + id);
+        log.info("encontrado funcionario de id: " + id);
         return ResponseEntity.ok(result);
     }
 
@@ -87,7 +87,7 @@ public class FuncionarioController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Funcionário cadastrado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Não foi achado Parceiro com esse ID"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Parceiro com esse ID"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos ou faltando"),
             @ApiResponse(responseCode = "403", description = "Id do Parceiro inválido")
     })
@@ -96,7 +96,7 @@ public class FuncionarioController {
         log.info("buscando parceiro de id: "+idParceiro);
         var parceiroResult = parceiroRepository.findById(idParceiro)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Parceiro não Encontrado"));
-        log.info("achado parceiro de id: "+parceiroResult.getId());
+        log.info("encontrado parceiro de id: "+parceiroResult.getId());
         funcionario.setParceiro(parceiroResult);
         funcionario.setSenha(encoder.encode(funcionario.getSenha()));
         funcionarioRepository.save(funcionario);
@@ -129,7 +129,7 @@ public class FuncionarioController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Funcionário deletado com sucesso"),
-            @ApiResponse(responseCode = "404", description = "Não foi achado Funcionário com esse ID"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Funcionário com esse ID"),
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
     public ResponseEntity<Funcionario> destroy(@PathVariable Long id){
@@ -137,7 +137,7 @@ public class FuncionarioController {
         log.info("buscando funcionario de id: " + id);
         var result = funcionarioRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionario não Encontrado"));
-        log.info("achado funcionario de id: " + id);
+        log.info("encontrado funcionario de id: " + id);
         funcionarioRepository.delete(result);
         log.info("deletado funcionario de id: " + id);
         return ResponseEntity.noContent().build();
@@ -151,7 +151,7 @@ public class FuncionarioController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Funcionário atualizado com sucesso"),
             @ApiResponse(responseCode = "400", description = "Dados inválidos ou faltando"),
-            @ApiResponse(responseCode = "404", description = "Não foi achado Funcionário com esse ID"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Funcionário com esse ID"),
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
     public ResponseEntity<Funcionario> update(@PathVariable Long id, @RequestBody @Valid Funcionario funcionario){
@@ -159,12 +159,12 @@ public class FuncionarioController {
         log.info("buscando funcionario de id: "+id);
         var result = funcionarioRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Funcionario não Encontrado"));
-        log.info("achado funcionario de id: "+id);
+        log.info("encontrado funcionario de id: "+id);
         funcionario.setSenha(encoder.encode(funcionario.getPassword()));
         funcionario.setId(id);
         funcionario.setParceiro(result.getParceiro());
         funcionarioRepository.save(funcionario);
-        log.info("atualizado funcionario (id:"+funcionario.getId()+", nome:"+funcionario.getNome()+", email:"+funcionario.getEmail()+")");
+        log.info("atualizado funcionario: "+funcionario.toString());
         return ResponseEntity.ok(funcionario);
     }
     

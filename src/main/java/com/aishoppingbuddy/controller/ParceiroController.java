@@ -42,14 +42,18 @@ public class ParceiroController {
 
     @GetMapping
     public List<Parceiro> load(){
-        return parceiroRepository.findAll();
+        log.info("exibindo todos parceiros");
+        var result = parceiroRepository.findAll();
+        log.info("retornando todos parceiros, nº de elementos:"+result.size());
+        return result;
     }
 
     @GetMapping("{id}")
     public ResponseEntity<Parceiro> index(@PathVariable Long id) {
-        log.info("buscando parceiro " + id);
+        log.info("buscando parceiro por id:" + id);
         var result = parceiroRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Parceiro não Encontrado"));
+        log.info("encontrado parceiro de id:" + id);
         return ResponseEntity.ok(result);
     }
 
@@ -58,29 +62,36 @@ public class ParceiroController {
         log.info("cadastrando parceiro");
         parceiro.setDataEntrada(LocalDate.now());
         parceiroRepository.save(parceiro);
+        log.info("cadastrado parceiro: "+parceiro.toString());
         return ResponseEntity.status(HttpStatus.CREATED).body(parceiro);
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<Parceiro> destroy(@PathVariable Long id){
-        log.info("deletando parceiro " + id);
+        log.info("deletando parceiro de id:" + id);
+        log.info("buscando parceiro por id:" + id);
         var result = parceiroRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Parceiro não Encontrado"));
+        log.info("encontrado parceiro de id:" + id);
         parceiroRepository.delete(result);
+        log.info("deletado parceiro de id:" + id);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("{id}")
     public ResponseEntity<Parceiro> update(@PathVariable Long id, @RequestBody @Valid Parceiro parceiro){
-        log.info("atualizando parceiro "+id);
+        log.info("atualizando parceiro de id:"+id);
+        log.info("buscando parceiro de id:"+id);
         var result = parceiroRepository.findById(id)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Parceiro não Encontrado"));
+        log.info("encontrado parceiro de id:"+id);
         parceiro.setId(id);
         parceiro.setTransacaoList(result.getTransacaoList());
         parceiro.setFuncionarioList(result.getFuncionarioList());
         parceiro.setProdutoList(result.getProdutoList());
         parceiro.setRecomendacaoList(result.getRecomendacaoList());
         parceiroRepository.save(parceiro);
+        log.info("atualizado parceiro: "+parceiro.toString());
         return ResponseEntity.ok(parceiro);
     }
 

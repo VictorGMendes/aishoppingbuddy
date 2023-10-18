@@ -34,18 +34,22 @@ public class Parceiro {
 
     @OneToMany(mappedBy = "parceiro")
     @JsonIgnore
+    @ToString.Exclude
     private List<Funcionario> funcionarioList;
 
     @OneToMany(mappedBy = "parceiro")
     @JsonIgnore
+    @ToString.Exclude
     private List<Transacao> transacaoList;
 
     @OneToMany(mappedBy = "parceiro")
     @JsonIgnore
+    @ToString.Exclude
     private List<Produto> produtoList;
 
     @OneToMany(mappedBy = "parceiro")
     @JsonIgnore
+    @ToString.Exclude
     private List<Recomendacao> recomendacaoList;
 
 }

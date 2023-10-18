@@ -34,15 +34,19 @@ public class Produto {
     @Column(name = "ds_categoria", nullable = false)
     private String categoria;
 
+
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "cd_parceiros")
     private Parceiro parceiro;
 
     @ManyToMany(mappedBy = "produtoList")
+    @ToString.Exclude
     @JsonIgnore
     private List<Recomendacao> recomendacaoList;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "cd_transacao")
     @JsonIgnore
     private Transacao transacao;
