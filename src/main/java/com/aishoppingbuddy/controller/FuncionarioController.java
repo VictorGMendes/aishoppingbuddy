@@ -57,7 +57,9 @@ public class FuncionarioController {
     })
     public List<Funcionario> load() {
         log.info("exibindo todos funcionarios");
-        return funcionarioRepository.findAll();
+        var result = funcionarioRepository.findAll();
+        log.info("retornando todos funcionarios, nº de elementos:"+result.size());
+        return result;
     }
 
     @GetMapping("{id}")
@@ -98,7 +100,7 @@ public class FuncionarioController {
         funcionario.setParceiro(parceiroResult);
         funcionario.setSenha(encoder.encode(funcionario.getSenha()));
         funcionarioRepository.save(funcionario);
-        log.info("cadastrado funcionario: (nome:"+funcionario.getNome()+", email:"+funcionario.getEmail()+")");
+        log.info("cadastrado funcionario: "+funcionario.toString());
         return ResponseEntity.status(HttpStatus.CREATED).body(funcionario);
     }
 

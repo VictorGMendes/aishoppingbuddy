@@ -3,10 +3,7 @@ package com.aishoppingbuddy.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 @Entity(name = "T_AISB_FUNCIONARIO")
 public class Funcionario implements UserDetails {
 
@@ -36,10 +34,12 @@ public class Funcionario implements UserDetails {
 
     @Column(name = "ds_senha", nullable = false)
     @NotEmpty(message = "Senha é obrigatório.")
+    @ToString.Exclude
     private String senha;
 
     @ManyToOne
     @JoinColumn(name = "cd_parceiros")
+    @ToString.Exclude
     private Parceiro parceiro;
 
     @Override
