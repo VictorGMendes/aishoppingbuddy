@@ -6,6 +6,9 @@ import com.aishoppingbuddy.repository.ProdutoRepository;
 import com.aishoppingbuddy.repository.RecomendacaoRepository;
 import com.aishoppingbuddy.repository.UsuarioRepository;
 import com.aishoppingbuddy.service.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -44,6 +47,14 @@ public class RecomendacaoController {
 
     @CrossOrigin
     @GetMapping
+    @Operation(
+            summary = "Listar recomendações",
+            description = "Retorna todos as recomendações"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recomendações listadas com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public Page<Recomendacao> listar(@RequestHeader("Authorization") String header, @PageableDefault(size = 5) Pageable pageable) {
         log.info("exibindo todas recomendacoes");
         log.info("buscando funcionario do token");
@@ -60,6 +71,14 @@ public class RecomendacaoController {
 
     @CrossOrigin
     @GetMapping("busca/{busca}")
+    @Operation(
+            summary = "Listar Recomendações por Busca",
+            description = "Recupere uma lista paginada de recomendações com base no critério de busca no título."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recomendações recuperadas com sucesso."),
+            @ApiResponse(responseCode = "403", description = "Token inválido.")
+    })
     public Page<Recomendacao> listarBusca(@RequestHeader("Authorization") String header, @PageableDefault(size = 5) Pageable pageable, @PathVariable String busca) {
         log.info("exibindo recomendacoes pela busca: "+busca);
         log.info("buscando funcionario do token");
@@ -76,6 +95,15 @@ public class RecomendacaoController {
 
     @CrossOrigin
     @GetMapping("{id}")
+    @Operation(
+            summary = "Detalhar Recomendação",
+            description = "Busca uma Recomendação por id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recomendação detalhado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Recomendação com esse ID"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public ResponseEntity<Recomendacao> index(@PathVariable Long id) {
         log.info("buscando recomendacao por id:" + id);
         var result = recomendacaoRepository.findById(id)
@@ -86,6 +114,14 @@ public class RecomendacaoController {
 
     @CrossOrigin
     @PostMapping("{idUsuario}")
+    @Operation(
+            summary = "Criar Recomendação",
+            description = "Cria uma nova recomendação para um usuário específico."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recomendação criada com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Token inválido.")
+    })
     public ResponseEntity<Object> criarRecomendacao(@RequestHeader("Authorization") String header, @PathVariable Long idUsuario, @RequestBody @Valid Recomendacao recomendacao) {
         log.info("buscando funcionario do token");
         var funcionarioResult = tokenService.validate(tokenService.getToken(header));
@@ -123,6 +159,14 @@ public class RecomendacaoController {
 
     @CrossOrigin
     @GetMapping("usuario/{idUsuario}")
+    @Operation(
+            summary = "Listar Recomendações do Usuário",
+            description = "Recupere uma lista paginada de recomendações para um usuário específico."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Recomendações recuperadas com sucesso."),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado.")
+    })
     public Page<Recomendacao> listarUsuario(@RequestHeader("Authorization") String header, @PathVariable long idUsuario, @PageableDefault(size = 5) Pageable pageable) {
         log.info("exibindo recomendacoes do usuario de id:"+idUsuario);
         log.info("buscando funcionario do token");

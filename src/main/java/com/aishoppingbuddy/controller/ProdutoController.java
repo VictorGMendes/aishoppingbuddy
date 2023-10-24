@@ -5,6 +5,9 @@ import com.aishoppingbuddy.repository.FuncionarioRepository;
 import com.aishoppingbuddy.repository.ParceiroRepository;
 import com.aishoppingbuddy.repository.ProdutoRepository;
 import com.aishoppingbuddy.service.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -39,6 +42,14 @@ public class ProdutoController {
     TokenService tokenService;
     
     @GetMapping
+    @Operation(
+            summary = "Listar Produtos",
+            description = "Retorna todos os produtos cadastrados"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produtos listados com sucesso"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public Page<Produto> load(@RequestHeader("Authorization") String header, @PageableDefault(size = 5) Pageable pageable) {
         log.info("exibindo todos produtos");
         log.info("buscando funcionario do token");
@@ -54,6 +65,14 @@ public class ProdutoController {
     }
     
     @GetMapping("nome/{busca}")
+    @Operation(
+            summary = "Listar Produtos por Nome",
+            description = "Recupere uma lista paginada de produtos com base no critério de busca por nome."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produtos recuperados com sucesso."),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public Page<Produto> listar(@RequestHeader("Authorization") String header, @PageableDefault(size = 5) Pageable pageable, @PathVariable String busca) {
         log.info("exibindo produtos pelo nome: "+busca);
         log.info("buscando funcionario do token");
@@ -69,6 +88,15 @@ public class ProdutoController {
     }
 
     @GetMapping("{id}")
+    @Operation(
+            summary = "Detalhar Produto",
+            description = "Busca um Produto por id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produto detalhado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Produto com esse ID"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public ResponseEntity<Produto> index(@PathVariable Long id) {
         log.info("buscando produto por id:" + id);
         var result = produtoRepository.findById(id)
@@ -78,6 +106,16 @@ public class ProdutoController {
     }
 
     @PostMapping
+    @Operation(
+            summary = "Cadastro Produto",
+            description = "Cadastrar um Produto"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Produto cadastrado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Produto com esse ID"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou faltando"),
+            @ApiResponse(responseCode = "403", description = "Id do Produto inválido")
+    })
     public ResponseEntity<Produto> create(@RequestHeader("Authorization") String header, @RequestBody @Valid Produto produto) {
         log.info("cadastrando produto");
         log.info("buscando funcionario do token");
@@ -91,6 +129,15 @@ public class ProdutoController {
     }
 
     @DeleteMapping("{id}")
+    @Operation(
+            summary = "Deletar Produto",
+            description = "Deleta um Produto por id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Produto deletado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Produto com esse ID"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public ResponseEntity<Produto> destroy(@PathVariable Long id){
         log.info("deletando produto de id:" + id);
         log.info("buscando produto por id:" + id);
@@ -103,6 +150,16 @@ public class ProdutoController {
     }
 
     @PutMapping("{id}")
+    @Operation(
+            summary = "Editar Produto",
+            description = "Editar um Produto por id"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou faltando"),
+            @ApiResponse(responseCode = "404", description = "Não foi encontrado Produto com esse ID"),
+            @ApiResponse(responseCode = "403", description = "Token inválido")
+    })
     public ResponseEntity<Produto> update(@PathVariable Long id, @RequestBody @Valid Produto produto){
         log.info("atualizando produto "+id);
         log.info("buscando produto por id:" + id);
