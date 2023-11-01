@@ -31,18 +31,6 @@ public class ParceiroController {
     @Autowired
     ParceiroRepository parceiroRepository;
 
-    @Autowired
-    TransacaoRepository transacaoRepository;
-
-    @Autowired
-    UsuarioRepository usuarioRepository;
-
-    @Autowired
-    ProdutoRepository produtoRepository;
-
-    @Autowired
-    RecomendacaoRepository recomendacaoRepository;
-
     @GetMapping
     @Operation(
             summary = "Listar Parceiros",

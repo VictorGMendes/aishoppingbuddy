@@ -33,12 +33,6 @@ public class ProdutoController {
     ProdutoRepository produtoRepository;
 
     @Autowired
-    FuncionarioRepository funcionarioRepository;
-
-    @Autowired
-    ParceiroRepository parceiroRepository;
-
-    @Autowired
     TokenService tokenService;
     
     @GetMapping

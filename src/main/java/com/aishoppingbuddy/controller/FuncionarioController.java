@@ -93,6 +93,7 @@ public class FuncionarioController {
     })
     public ResponseEntity<Object> cadastro(@PathVariable Long idParceiro, @RequestBody @Valid Funcionario funcionario) {
         log.info("cadastrando funcionario");
+        log.info(parceiroRepository.findAll().toString());
         log.info("buscando parceiro de id: "+idParceiro);
         var parceiroResult = parceiroRepository.findById(idParceiro)
                 .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "Parceiro não Encontrado"));

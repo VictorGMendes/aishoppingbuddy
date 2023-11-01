@@ -30,9 +30,6 @@ public class UsuarioController {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    @Autowired
-    TokenService tokenService;
-
     @CrossOrigin
     @GetMapping
     @Operation(
