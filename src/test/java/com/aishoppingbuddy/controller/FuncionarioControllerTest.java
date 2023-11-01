@@ -1,4 +1,4 @@
-package com.aishoppingbuddy.funcionario;
+package com.aishoppingbuddy.controller;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class FuncionarioTest {
+public class FuncionarioControllerTest {
 
     @LocalServerPort
     private int port;
@@ -25,7 +25,7 @@ public class FuncionarioTest {
     Logger log = LoggerFactory.getLogger(getClass());
 
     @Test
-    public void givenFuncionario_whenPost_thenShouldBeRegistered() throws Exception {
+    public void givenFuncionario_whenPost_shouldBeRegistered() throws Exception {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
