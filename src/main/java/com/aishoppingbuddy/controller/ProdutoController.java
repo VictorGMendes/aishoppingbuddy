@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -44,7 +43,7 @@ public class ProdutoController {
             @ApiResponse(responseCode = "200", description = "Produtos listados com sucesso"),
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
-    public Page<Produto> load(@RequestHeader("Authorization") String header, @PageableDefault(size = 15) Pageable pageable) {
+    public PageImpl<Produto> load(@RequestHeader("Authorization") String header, @PageableDefault(size = 15) Pageable pageable) {
         log.info("exibindo todos produtos");
         log.info("buscando funcionario do token");
         var funcionarioResult = tokenService.validate(tokenService.getToken(header));
@@ -67,7 +66,7 @@ public class ProdutoController {
             @ApiResponse(responseCode = "200", description = "Produtos recuperados com sucesso."),
             @ApiResponse(responseCode = "403", description = "Token inválido")
     })
-    public Page<Produto> listar(@RequestHeader("Authorization") String header, @PageableDefault(size = 15) Pageable pageable, @PathVariable String busca) {
+    public PageImpl<Produto> listar(@RequestHeader("Authorization") String header, @PageableDefault(size = 15) Pageable pageable, @PathVariable String busca) {
         log.info("exibindo produtos pelo nome: "+busca);
         log.info("buscando funcionario do token");
         var funcionarioResult = tokenService.validate(tokenService.getToken(header));

@@ -18,20 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.http.*;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class ProdutoControllerTest {
@@ -44,6 +41,7 @@ public class ProdutoControllerTest {
 
     Logger log = LoggerFactory.getLogger(getClass());
     Faker faker = new Faker(new Locale("pt-BR"));
+    Random random = new Random();
 
     ObjectMapper objectMapper = JsonMapper.builder()
             .addModule(new ParameterNamesModule())
@@ -84,22 +82,200 @@ public class ProdutoControllerTest {
     }
 
     @Test
-    public void givenParceiros_whenGet_shouldReturnAllParceiros() throws Exception {
+    public void givenProdutos_whenGet_shouldReturnAllProdutosFromParceiroOfToken() throws Exception {
 
         var token = createToken();
         log.info(token.token());
 
         FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
 
-        Parceiro pa1 = new Parceiro();
-        pa1.setNomeFantasia(faker.company().name());
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
+
+        Parceiro pa2 = new Parceiro();
+        pa2.setNomeFantasia(faker.company().name());
         String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        pa1.setCnpj(cnpj1);
+        pa2.setCnpj(cnpj1);
         long minDay1 = LocalDate.of(2023, 1, 1).toEpochDay();
         long maxDay1 = LocalDate.now().toEpochDay();
         long randomDay1 = ThreadLocalRandom.current().nextLong(minDay1, maxDay1);
-        pa1.setDataEntrada(LocalDate.ofEpochDay(randomDay1));
-        parceiroRepository.save(pa1);
+        pa2.setDataEntrada(LocalDate.ofEpochDay(randomDay1));
+        parceiroRepository.save(pa2);
+
+        Produto pr1 = new Produto();
+        pr1.setNome(faker.commerce().productName());
+        pr1.setCategoria(faker.commerce().material());
+        pr1.setTipo(faker.commerce().color());
+        double randomValue = .99 + (random.nextDouble() * (100000 - .99));
+        pr1.setValor(Math.round(randomValue * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr1.setDescricao(faker.lorem().characters(1,100));
+        pr1.setParceiro(pa1);
+        produtoRepository.save(pr1);
+
+        Produto pr2 = new Produto();
+        pr2.setNome(faker.commerce().productName());
+        pr2.setCategoria(faker.commerce().material());
+        pr2.setTipo(faker.commerce().color());
+        double randomValue2 = .99 + (random.nextDouble() * (100000 - .99));
+        pr2.setValor(Math.round(randomValue2 * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr2.setDescricao(faker.lorem().characters(1,100));
+        pr2.setParceiro(pa1);
+        produtoRepository.save(pr2);
+
+        Produto pr3 = new Produto();
+        pr3.setNome(faker.commerce().productName());
+        pr3.setCategoria(faker.commerce().material());
+        pr3.setTipo(faker.commerce().color());
+        double randomValue3 = .99 + (random.nextDouble() * (100000 - .99));
+        pr3.setValor(Math.round(randomValue3 * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr3.setDescricao(faker.lorem().characters(1,100));
+        pr3.setParceiro(pa2);
+        produtoRepository.save(pr3);
+
+        Produto pr4 = new Produto();
+        pr4.setNome(faker.commerce().productName());
+        pr4.setCategoria(faker.commerce().material());
+        pr4.setTipo(faker.commerce().color());
+        double randomValue4 = .99 + (random.nextDouble() * (100000 - .99));
+        pr4.setValor(Math.round(randomValue4 * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr4.setDescricao(faker.lorem().characters(1,100));
+        pr4.setParceiro(pa2);
+        produtoRepository.save(pr4);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+token.token());
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/produto";
+        ResponseEntity<CustomPageImpl<Produto>> response = restTemplate.exchange(baseUrl, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<CustomPageImpl<Produto>>() {});
+
+        PageImpl<Produto> page = response.getBody();
+
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(page);
+        assertEquals(2,page.getContent().size());
+    }
+
+    @Test
+    public void givenProdutos_whenGetById_shouldReturnProdutoById() throws Exception {
+        var token = createToken();
+        log.info(token.token());
+
+        FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
+
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
+
+        Parceiro pa2 = new Parceiro();
+        pa2.setNomeFantasia(faker.company().name());
+        String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
+        pa2.setCnpj(cnpj1);
+        long minDay1 = LocalDate.of(2023, 1, 1).toEpochDay();
+        long maxDay1 = LocalDate.now().toEpochDay();
+        long randomDay1 = ThreadLocalRandom.current().nextLong(minDay1, maxDay1);
+        pa2.setDataEntrada(LocalDate.ofEpochDay(randomDay1));
+        parceiroRepository.save(pa2);
+
+        Produto pr1 = new Produto();
+        pr1.setNome(faker.commerce().productName());
+        pr1.setCategoria(faker.commerce().material());
+        pr1.setTipo(faker.commerce().color());
+        double randomValue = .99 + (random.nextDouble() * (100000 - .99));
+        pr1.setValor(Math.round(randomValue * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr1.setDescricao(faker.lorem().characters(1,100));
+        pr1.setParceiro(pa1);
+        produtoRepository.save(pr1);
+
+        Produto pr2 = new Produto();
+        pr2.setNome(faker.commerce().productName());
+        pr2.setCategoria(faker.commerce().material());
+        pr2.setTipo(faker.commerce().color());
+        double randomValue2 = .99 + (random.nextDouble() * (100000 - .99));
+        pr2.setValor(Math.round(randomValue2 * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr2.setDescricao(faker.lorem().characters(1,100));
+        pr2.setParceiro(pa1);
+        produtoRepository.save(pr2);
+
+        Produto pr3 = new Produto();
+        pr3.setNome(faker.commerce().productName());
+        pr3.setCategoria(faker.commerce().material());
+        pr3.setTipo(faker.commerce().color());
+        double randomValue3 = .99 + (random.nextDouble() * (100000 - .99));
+        pr3.setValor(Math.round(randomValue3 * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr3.setDescricao(faker.lorem().characters(1,100));
+        pr3.setParceiro(pa2);
+        produtoRepository.save(pr3);
+
+        Produto pr4 = new Produto();
+        pr4.setNome(faker.commerce().productName());
+        pr4.setCategoria(faker.commerce().material());
+        pr4.setTipo(faker.commerce().color());
+        double randomValue4 = .99 + (random.nextDouble() * (100000 - .99));
+        pr4.setValor(Math.round(randomValue4 * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr4.setDescricao(faker.lorem().characters(1,100));
+        pr4.setParceiro(pa2);
+        produtoRepository.save(pr4);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+token.token());
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/produto/2";
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.GET, requestEntity, String.class);
+
+        var found = objectMapper.readValue(response.getBody(), Produto.class);
+        log.info(found.toString());
+
+        assertEquals(200, response.getStatusCode().value());
+        assertEquals(pr2.getId(),found.getId());
+        assertEquals(pr2.getNome(),found.getNome());
+        assertEquals(pr2.getTipo(),found.getTipo());
+        assertEquals(pr2.getDescricao(),found.getDescricao());
+        assertEquals(pr2.getCategoria(),found.getCategoria());
+        assertEquals(pr2.getValor(),found.getValor());
+    }
+
+    @Test
+    public void givenProduto_whenPost_shouldBeCreated() throws Exception {
+        var token = createToken();
+        log.info(token.token());
+
+        FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
+
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
+
+        Produto pr1 = new Produto();
+        pr1.setNome(faker.commerce().productName());
+        pr1.setCategoria(faker.commerce().material());
+        pr1.setTipo(faker.commerce().color());
+        double randomValue = .99 + (random.nextDouble() * (100000 - .99));
+        pr1.setValor(Math.round(randomValue * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr1.setDescricao(faker.lorem().characters(1,100));
+        pr1.setParceiro(pa1);
+        produtoRepository.save(pr1);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+token.token());
+        headers.set("Content-Type", "application/json");
+        String requestBody = objectMapper.writeValueAsString(pr1);
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/produto";
+        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, String.class);
+
+        var found = produtoRepository.findById(1L);
+
+        assertEquals(201, response.getStatusCode().value());
+        assertEquals(objectMapper.writeValueAsString(found),response.getBody());
+    }
+
+    @Test
+    public void givenProdutos_whenDeleteById_shouldBeRemovedById() throws Exception {
+        var token = createToken();
+        log.info(token.token());
+
+        FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
+
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
 
         Parceiro pa2 = new Parceiro();
         pa2.setNomeFantasia(faker.company().name());
@@ -115,229 +291,98 @@ public class ProdutoControllerTest {
         pr1.setNome(faker.commerce().productName());
         pr1.setCategoria(faker.commerce().material());
         pr1.setTipo(faker.commerce().color());
-        pr1.setValor(ThreadLocalRandom.current().nextDouble(.99,100000));
+        double randomValue = .99 + (random.nextDouble() * (100000 - .99));
+        pr1.setValor((randomValue * Math.pow(10, 2)) / Math.pow(10, 2));
         pr1.setDescricao(faker.lorem().characters(1,100));
+        pr1.setParceiro(pa1);
         produtoRepository.save(pr1);
 
         Produto pr2 = new Produto();
         pr2.setNome(faker.commerce().productName());
         pr2.setCategoria(faker.commerce().material());
         pr2.setTipo(faker.commerce().color());
-        pr2.setValor(ThreadLocalRandom.current().nextDouble(.99,100000));
+        double randomValue2 = .99 + (random.nextDouble() * (100000 - .99));
+        pr2.setValor((randomValue2 * Math.pow(10, 2)) / Math.pow(10, 2));
         pr2.setDescricao(faker.lorem().characters(1,100));
+        pr2.setParceiro(pa1);
         produtoRepository.save(pr2);
 
         Produto pr3 = new Produto();
         pr3.setNome(faker.commerce().productName());
         pr3.setCategoria(faker.commerce().material());
         pr3.setTipo(faker.commerce().color());
-        pr3.setValor(ThreadLocalRandom.current().nextDouble(.99,100000));
+        double randomValue3 = .99 + (random.nextDouble() * (100000 - .99));
+        pr3.setValor((randomValue3 * Math.pow(10, 2)) / Math.pow(10, 2));
         pr3.setDescricao(faker.lorem().characters(1,100));
+        pr3.setParceiro(pa2);
         produtoRepository.save(pr3);
 
         Produto pr4 = new Produto();
         pr4.setNome(faker.commerce().productName());
         pr4.setCategoria(faker.commerce().material());
         pr4.setTipo(faker.commerce().color());
-        pr4.setValor(ThreadLocalRandom.current().nextDouble(.99,100000));
+        double randomValue4 = .99 + (random.nextDouble() * (100000 - .99));
+        pr4.setValor((randomValue4 * Math.pow(10, 2)) / Math.pow(10, 2));
         pr4.setDescricao(faker.lorem().characters(1,100));
+        pr4.setParceiro(pa2);
         produtoRepository.save(pr4);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer "+token.token());
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/produto";
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.GET, requestEntity, String.class);
-
-        var page = objectMapper.readValue(response.getBody(), Page.class);
-        log.info(page.toString());
-
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(4,page.getContent().size());
-    }
-
-    @Test
-    public void givenParceiros_whenGetById_shouldReturnParceiroById() throws Exception {
-        var token = createToken();
-        log.info(token.token());
-
-        FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
-
-        Parceiro p1 = new Parceiro();
-        p1.setNomeFantasia(faker.company().name());
-        String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p1.setCnpj(cnpj1);
-        long minDay1 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay1 = LocalDate.now().toEpochDay();
-        long randomDay1 = ThreadLocalRandom.current().nextLong(minDay1, maxDay1);
-        p1.setDataEntrada(LocalDate.ofEpochDay(randomDay1));
-        parceiroRepository.save(p1);
-
-        Parceiro p2 = new Parceiro();
-        p2.setNomeFantasia(faker.company().name());
-        String cnpj2 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p2.setCnpj(cnpj2);
-        long minDay2 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay2 = LocalDate.now().toEpochDay();
-        long randomDay2 = ThreadLocalRandom.current().nextLong(minDay2, maxDay2);
-        p2.setDataEntrada(LocalDate.ofEpochDay(randomDay2));
-        parceiroRepository.save(p2);
-
-        Parceiro p3 = new Parceiro();
-        p3.setNomeFantasia(faker.company().name());
-        String cnpj3 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p3.setCnpj(cnpj3);
-        long minDay3 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay3 = LocalDate.now().toEpochDay();
-        long randomDay3 = ThreadLocalRandom.current().nextLong(minDay3, maxDay3);
-        p3.setDataEntrada(LocalDate.ofEpochDay(randomDay3));
-        parceiroRepository.save(p3);
-
-        Parceiro p4 = new Parceiro();
-        p4.setNomeFantasia(faker.company().name());
-        String cnpj4 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p4.setCnpj(cnpj4);
-        long minDay4 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay4 = LocalDate.now().toEpochDay();
-        long randomDay4 = ThreadLocalRandom.current().nextLong(minDay4, maxDay4);
-        p4.setDataEntrada(LocalDate.ofEpochDay(randomDay4));
-        parceiroRepository.save(p4);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer "+token.token());
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/parceiro/3";
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.GET, requestEntity, String.class);
-
-        var found = objectMapper.readValue(response.getBody(), Parceiro.class);
-        log.info(found.toString());
-
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(p2,found);
-    }
-
-    @Test
-    public void givenParceiro_whenPost_shouldBeCreated() throws Exception {
-        var token = createToken();
-        log.info(token.token());
-
-        FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
-
-        Parceiro p1 = new Parceiro();
-        p1.setNomeFantasia(faker.company().name());
-        String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p1.setCnpj(cnpj1);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer "+token.token());
-        headers.set("Content-Type", "application/json");
-        String requestBody = objectMapper.writeValueAsString(p1);
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/parceiro";
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, String.class);
-
-        var found = parceiroRepository.findById(2L);
-
-        assertEquals(201, response.getStatusCode().value());
-        assertEquals(objectMapper.writeValueAsString(found),response.getBody());
-    }
-
-    @Test
-    public void givenParceiro_whenDeleteById_shouldBeRemoved() throws Exception {
-        var token = createToken();
-        log.info(token.token());
-
-        FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
-
-        Parceiro p1 = new Parceiro();
-        p1.setNomeFantasia(faker.company().name());
-        String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p1.setCnpj(cnpj1);
-        long minDay1 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay1 = LocalDate.now().toEpochDay();
-        long randomDay1 = ThreadLocalRandom.current().nextLong(minDay1, maxDay1);
-        p1.setDataEntrada(LocalDate.ofEpochDay(randomDay1));
-        parceiroRepository.save(p1);
-
-        Parceiro p2 = new Parceiro();
-        p2.setNomeFantasia(faker.company().name());
-        String cnpj2 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p2.setCnpj(cnpj2);
-        long minDay2 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay2 = LocalDate.now().toEpochDay();
-        long randomDay2 = ThreadLocalRandom.current().nextLong(minDay2, maxDay2);
-        p2.setDataEntrada(LocalDate.ofEpochDay(randomDay2));
-        parceiroRepository.save(p2);
-
-        Parceiro p3 = new Parceiro();
-        p3.setNomeFantasia(faker.company().name());
-        String cnpj3 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p3.setCnpj(cnpj3);
-        long minDay3 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay3 = LocalDate.now().toEpochDay();
-        long randomDay3 = ThreadLocalRandom.current().nextLong(minDay3, maxDay3);
-        p3.setDataEntrada(LocalDate.ofEpochDay(randomDay3));
-        parceiroRepository.save(p3);
-
-        Parceiro p4 = new Parceiro();
-        p4.setNomeFantasia(faker.company().name());
-        String cnpj4 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p4.setCnpj(cnpj4);
-        long minDay4 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay4 = LocalDate.now().toEpochDay();
-        long randomDay4 = ThreadLocalRandom.current().nextLong(minDay4, maxDay4);
-        p4.setDataEntrada(LocalDate.ofEpochDay(randomDay4));
-        parceiroRepository.save(p4);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer "+token.token());
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/parceiro/3";
+        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/produto/2";
         ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.DELETE, requestEntity, String.class);
 
         assertEquals(204, response.getStatusCode().value());
-        assertFalse(parceiroRepository.findAll().contains(p2));
+        assertFalse(parceiroRepository.findAll().contains(pr2));
 
     }
 
     @Test
-    public void givenParceiro_whenPutId_shouldUpdateById() throws Exception {
+    public void givenProduto_whenPutId_shouldUpdateById() throws Exception {
         var token = createToken();
         log.info(token.token());
 
         FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
 
-        Parceiro p1 = new Parceiro();
-        p1.setNomeFantasia(faker.company().name());
-        String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p1.setCnpj(cnpj1);
-        long minDay1 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay1 = LocalDate.now().toEpochDay();
-        long randomDay1 = ThreadLocalRandom.current().nextLong(minDay1, maxDay1);
-        p1.setDataEntrada(LocalDate.ofEpochDay(randomDay1));
-        parceiroRepository.save(p1);
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
 
-        Parceiro p2 = new Parceiro();
-        p2.setNomeFantasia(faker.company().name());
-        String cnpj2 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        p2.setCnpj(cnpj2);
-        long minDay2 = LocalDate.of(2023, 1, 1).toEpochDay();
-        long maxDay2 = LocalDate.now().toEpochDay();
-        long randomDay2 = ThreadLocalRandom.current().nextLong(minDay2, maxDay2);
-        p2.setDataEntrada(LocalDate.ofEpochDay(randomDay2));
+        Produto pr1 = new Produto();
+        pr1.setNome(faker.commerce().productName());
+        pr1.setCategoria(faker.commerce().material());
+        pr1.setTipo(faker.commerce().color());
+        double randomValue = .99 + (random.nextDouble() * (100000 - .99));
+        pr1.setValor((randomValue * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr1.setDescricao(faker.lorem().characters(1,100));
+        pr1.setParceiro(pa1);
+        produtoRepository.save(pr1);
+
+        Produto pr2 = new Produto();
+        pr2.setNome(faker.commerce().productName());
+        pr2.setCategoria(faker.commerce().material());
+        pr2.setTipo(faker.commerce().color());
+        double randomValue2 = .99 + (random.nextDouble() * (100000 - .99));
+        pr2.setValor((randomValue2 * Math.pow(10, 2)) / Math.pow(10, 2));
+        pr2.setDescricao(faker.lorem().characters(1,100));
+        pr2.setParceiro(pa1);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer "+token.token());
         headers.set("Content-Type", "application/json");
-        String requestBody = objectMapper.writeValueAsString(p2);
+        String requestBody = objectMapper.writeValueAsString(pr2);
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
-        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/parceiro/2";
+        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/produto/1";
         ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.PUT, requestEntity, String.class);
 
         assertEquals(200, response.getStatusCode().value());
-        var found = parceiroRepository.findById(2L)
+        var found = produtoRepository.findById(1L)
                 .orElseThrow();
-        assertEquals(p2.getNomeFantasia(),found.getNomeFantasia());
+        assertEquals(pr2.getNome(),found.getNome());
+        assertEquals(pr2.getTipo(),found.getTipo());
+        assertEquals(pr2.getDescricao(),found.getDescricao());
+        assertEquals(pr2.getCategoria(),found.getCategoria());
+        assertEquals(pr2.getValor(),found.getValor());
 
     }
 
