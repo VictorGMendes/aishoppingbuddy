@@ -234,7 +234,6 @@ public class FuncionarioControllerTest {
         Parceiro p1 = new Parceiro();
         p1.setNomeFantasia(faker.company().name());
         String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        log.info(cnpj1);
         p1.setCnpj(cnpj1);
         long minDay1 = LocalDate.of(2023, 1, 1).toEpochDay();
         long maxDay1 = LocalDate.now().toEpochDay();
@@ -245,7 +244,6 @@ public class FuncionarioControllerTest {
         Parceiro p2 = new Parceiro();
         p2.setNomeFantasia(faker.company().name());
         String cnpj2 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        log.info(cnpj2);
         p2.setCnpj(cnpj2);
         long minDay2 = LocalDate.of(2023, 1, 1).toEpochDay();
         long maxDay2 = LocalDate.now().toEpochDay();
@@ -296,7 +294,7 @@ public class FuncionarioControllerTest {
     }
 
     @Test
-    public void givenFuncionarios_deleteById_shouldReturnById() throws Exception {
+    public void givenFuncionarioId_whenDeleteById_shouldBeDeletedById() throws Exception {
         var token = createToken();
         log.info(token.token());
 
@@ -305,13 +303,22 @@ public class FuncionarioControllerTest {
         Parceiro p1 = new Parceiro();
         p1.setNomeFantasia(faker.company().name());
         String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        log.info(cnpj1);
         p1.setCnpj(cnpj1);
         long minDay1 = LocalDate.of(2023, 1, 1).toEpochDay();
         long maxDay1 = LocalDate.now().toEpochDay();
         long randomDay1 = ThreadLocalRandom.current().nextLong(minDay1, maxDay1);
         p1.setDataEntrada(LocalDate.ofEpochDay(randomDay1));
         parceiroRepository.save(p1);
+
+        Parceiro p2 = new Parceiro();
+        p2.setNomeFantasia(faker.company().name());
+        String cnpj2 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
+        p2.setCnpj(cnpj2);
+        long minDay2 = LocalDate.of(2023, 1, 1).toEpochDay();
+        long maxDay2 = LocalDate.now().toEpochDay();
+        long randomDay2 = ThreadLocalRandom.current().nextLong(minDay2, maxDay2);
+        p2.setDataEntrada(LocalDate.ofEpochDay(randomDay2));
+        parceiroRepository.save(p2);
 
         Funcionario f1 = new Funcionario();
         f1.setNome(faker.name().fullName());
@@ -320,19 +327,40 @@ public class FuncionarioControllerTest {
         f1.setParceiro(p1);
         funcionarioRepository.save(f1);
 
+        Funcionario f2 = new Funcionario();
+        f2.setNome(faker.name().fullName());
+        f2.setEmail(faker.internet().emailAddress());
+        f2.setSenha(encoder.encode(faker.internet().password()));
+        f2.setParceiro(p1);
+        funcionarioRepository.save(f2);
+
+        Funcionario f3 = new Funcionario();
+        f3.setNome(faker.name().fullName());
+        f3.setEmail(faker.internet().emailAddress());
+        f3.setSenha(encoder.encode(faker.internet().password()));
+        f3.setParceiro(p2);
+        funcionarioRepository.save(f3);
+
+        Funcionario f4 = new Funcionario();
+        f4.setNome(faker.name().fullName());
+        f4.setEmail(faker.internet().emailAddress());
+        f4.setSenha(encoder.encode(faker.internet().password()));
+        f4.setParceiro(p2);
+        funcionarioRepository.save(f4);
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer "+token.token());
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/funcionario/2";
+        String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/funcionario/3";
         ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.DELETE, requestEntity, String.class);
 
         assertEquals(204, response.getStatusCode().value());
-        assertEquals(1, funcionarioRepository.findAll().size());
+        assertFalse(funcionarioRepository.findAll().contains(f1));
         
     }
 
     @Test
-    public void givenFuncionarios_updateFuncionario_shouldReturnUpdatedFuncionario() throws Exception {
+    public void givenFuncionario_whenPutFuncionarioById_shouldUpdateById() throws Exception {
         var token = createToken();
         log.info(token.token());
 
@@ -341,7 +369,6 @@ public class FuncionarioControllerTest {
         Parceiro p1 = new Parceiro();
         p1.setNomeFantasia(faker.company().name());
         String cnpj1 = fakeValuesService.regexify("\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}\\-\\d{2}");
-        log.info(cnpj1);
         p1.setCnpj(cnpj1);
         long minDay1 = LocalDate.of(2023, 1, 1).toEpochDay();
         long maxDay1 = LocalDate.now().toEpochDay();
