@@ -37,10 +37,12 @@ public class Usuario {
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore
+    @ToString.Exclude
     private List<Recomendacao> recomendacaoList;
 
     @OneToMany(mappedBy = "usuario")
     @JsonIgnore
+    @ToString.Exclude
     private List<Transacao> transacaoList;
 
 }
