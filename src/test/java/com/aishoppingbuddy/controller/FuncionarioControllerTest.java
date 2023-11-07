@@ -6,7 +6,6 @@ import com.aishoppingbuddy.model.Parceiro;
 import com.aishoppingbuddy.model.Token;
 import com.aishoppingbuddy.repository.FuncionarioRepository;
 import com.aishoppingbuddy.repository.ParceiroRepository;
-import com.aishoppingbuddy.service.TokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
@@ -56,9 +55,6 @@ public class FuncionarioControllerTest {
 
     @Autowired
     PasswordEncoder encoder;
-
-    @Autowired
-    TokenService tokenService;
 
     public Token createToken() throws Exception {
         Funcionario funcionario = new Funcionario();
@@ -139,8 +135,6 @@ public class FuncionarioControllerTest {
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
         String baseUrl = "http://localhost:" + port + "/aishoppingbuddy/api/funcionario/login";
         ResponseEntity<String> response = restTemplate.exchange(baseUrl, HttpMethod.POST, requestEntity, String.class);
-
-        var token = tokenService.generateToken(credentials);
 
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(objectMapper.readValue(response.getBody(), Token.class));
