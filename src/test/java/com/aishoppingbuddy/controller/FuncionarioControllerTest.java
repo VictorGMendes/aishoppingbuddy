@@ -83,6 +83,11 @@ public class FuncionarioControllerTest {
     }
 
     @Test
+    // # Testa cadastro de um funcionário
+    // — Cria um funcionário
+    // — Faz a chamada na API para cadastrar
+    // — Verifica se o código foi 201
+    // — Verifica se o funcionário cadastrado possuí os dados enviados
     public void givenFuncionario_whenPost_shouldBeRegistered() throws Exception {
 
         HttpHeaders headers = new HttpHeaders();
@@ -112,6 +117,11 @@ public class FuncionarioControllerTest {
     }
 
     @Test
+    // # Testa o login de funcionário
+    // — Cria um funcionário cadastra
+    // — Faz a chamada POST na API para login
+    // — Verifica se o código foi 201
+    // — Verifica se foi retornado um token
     public void givenCredentials_whenLogin_shouldReturnToken () throws Exception {
 
         HttpHeaders headers = new HttpHeaders();
@@ -141,6 +151,12 @@ public class FuncionarioControllerTest {
     }
 
     @Test
+    // # Testa o método createToken()
+    // — Cria um funcionário
+    // — Efetua o login desse funcionário
+    // — Retorna o token do login
+    // — Verifica se token foi retornado
+    // — Verifica se o funcionário foi criado
     public void withCreateToken_shouldCreateFuncionarioAndToken() throws Exception {
 
         var token = createToken();
@@ -155,6 +171,12 @@ public class FuncionarioControllerTest {
     }
 
     @Test
+    // # Testa o GET
+    // — Cria o token com createToken()
+    // — Cria alguns funcionários de parceiros diferentes
+    // — Faz a chamada GET na API
+    // — Verifica se o código foi 200
+    // — Verifica se o retorno possuí 5 elementos
     public void givenFuncionarios_whenGet_shouldReturnAll() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -225,6 +247,12 @@ public class FuncionarioControllerTest {
     }
 
     @Test
+    // # Testa o GET por ID
+    // — Cria o token com createToken()
+    // — Cria alguns funcionários de parceiros diferentes
+    // — Faz a chamada GET na API com ID:3
+    // — Verifica se o código foi 200
+    // — Verifica se o retorno é o funcionário de ID:5
     public void givenFuncionarios_whenGetById_shouldReturnById() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -294,6 +322,12 @@ public class FuncionarioControllerTest {
     }
 
     @Test
+    // # Testa o DELETE por ID
+    // — Cria o token com createToken()
+    // — Cria alguns funcionários de parceiros diferentes
+    // — Faz a chamada DELETE na API com ID:3
+    // — Verifica se o código foi 204
+    // — Verifica se o funcionário de ID:3 não existe no banco
     public void givenFuncionarioId_whenDeleteById_shouldBeDeletedById() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -360,6 +394,13 @@ public class FuncionarioControllerTest {
     }
 
     @Test
+    // # Testa o PUT por ID
+    // — Cria o token com createToken()
+    // — Cria um funcionário
+    // — Cria outro funcionário com dados diferentes sem salvar no banco
+    // — Faz a chamada PUT na API com ID:2 e com corpo do outro funcionário
+    // — Verifica se o código foi 204
+    // — Verifica se os dados do funcionário de ID:2 são os dados atualizados
     public void givenFuncionario_whenPutFuncionarioById_shouldUpdateById() throws Exception {
         var token = createToken();
         log.info(token.token());
