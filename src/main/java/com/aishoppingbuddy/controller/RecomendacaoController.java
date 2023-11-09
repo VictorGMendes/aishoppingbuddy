@@ -5,6 +5,7 @@ import com.aishoppingbuddy.model.Recomendacao;
 import com.aishoppingbuddy.repository.ProdutoRepository;
 import com.aishoppingbuddy.repository.RecomendacaoRepository;
 import com.aishoppingbuddy.repository.UsuarioRepository;
+import com.aishoppingbuddy.service.ChatGPTService;
 import com.aishoppingbuddy.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -44,6 +46,9 @@ public class RecomendacaoController {
 
     @Autowired
     TokenService tokenService;
+
+    @Autowired
+    ChatGPTService chatGPTService;
 
     @CrossOrigin
     @GetMapping
@@ -122,7 +127,7 @@ public class RecomendacaoController {
             @ApiResponse(responseCode = "200", description = "Recomendação criada com sucesso."),
             @ApiResponse(responseCode = "404", description = "Token inválido.")
     })
-    public ResponseEntity<Object> criarRecomendacao(@RequestHeader("Authorization") String header, @PathVariable Long idUsuario, @RequestBody @Valid Recomendacao recomendacao) {
+    public ResponseEntity<Object> criarRecomendacao(@RequestHeader("Authorization") String header, @PathVariable Long idUsuario, @RequestBody @Valid Recomendacao recomendacao) throws IOException, InterruptedException {
         log.info("buscando funcionario do token");
         var funcionarioResult = tokenService.validate(tokenService.getToken(header));
         log.info("buscando parceiro do funcionario");
@@ -134,25 +139,24 @@ public class RecomendacaoController {
         Optional<Produto> primeiroProduto = produtoRepository.findById(recomendacao.getProdutoList().get(0).getId());
 
         log.info("gerando mensagem da recomendacao");
-        String mensagem = "MENSAGEM GERADA PELO CHATGPT";
+        String mensagem = chatGPTService.generateMessage(recomendacao.getProdutoList(),usuarioResult);
 
         recomendacao.setParceiro(parceiroResult);
         recomendacao.setUsuario(usuarioResult);
         recomendacao.setMensagem(mensagem);
         recomendacao.setData(LocalDate.now());
         primeiroProduto.ifPresent(produto -> recomendacao.setTitulo(produto.getNome()));
+        for (Produto produto:recomendacao.getProdutoList()) {
+            Produto produtoSalvo = produtoRepository.getReferenceById(produto.getId());
+            recomendacao.getProdutoList().remove(produto);
+            produtoSalvo.getRecomendacaoList().add(recomendacao);
+            recomendacao.getProdutoList().add(produtoSalvo);
+            log.info("relacionando produto #"+produtoSalvo.getId()+" com a recomendacao criada");
+        }
 
         recomendacaoRepository.save(recomendacao);
         log.info("criada recomendacao: "+recomendacao.toString());
 
-        log.info("relacionando produtos com a recomendacao criada");
-        for (Produto produto:recomendacao.getProdutoList()) {
-            Produto produtoSalvo = produtoRepository.getReferenceById(produto.getId());
-            produtoSalvo.getRecomendacaoList().add(recomendacao);
-            produtoRepository.save(produtoSalvo);
-            log.info("salvando produto #"+produtoSalvo.getId()+" na recomendacao #"+recomendacao.getId());
-        }
-        log.info("relacionamentos da recomendação #"+recomendacao.getId()+" salvos");
         return ResponseEntity.ok(recomendacaoRepository.findById(recomendacao.getId()));
 
     }

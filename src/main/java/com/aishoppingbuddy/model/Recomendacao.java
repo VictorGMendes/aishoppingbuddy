@@ -1,5 +1,6 @@
 package com.aishoppingbuddy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString
-@Entity(name = "T_AISB_RECOMENDACAO")
+@Entity(name = "t_aisb_recomendacao")
 public class Recomendacao {
 
     @Id
@@ -22,17 +23,18 @@ public class Recomendacao {
     @Column(name = "ds_titulo", nullable = false)
     private String titulo;
 
-    @Column(name = "ds_mensagem_recomendacao", nullable = false)
+    @Column(name = "ds_mensagem_recomendacao", nullable = false,length = 2000)
     private String mensagem;
 
     @Column(name = "dt_mensagem", nullable = false)
     private LocalDate data;
 
-    @ManyToMany
+    @ManyToMany(cascade = { CascadeType.ALL })
     @JoinTable(
             name = "possui",
             joinColumns = @JoinColumn(name = "cd_recomendacao"),
             inverseJoinColumns = @JoinColumn(name = "cd_produto"))
+    @ToString.Exclude
     //@JsonIgnore
     private List<Produto> produtoList;
 

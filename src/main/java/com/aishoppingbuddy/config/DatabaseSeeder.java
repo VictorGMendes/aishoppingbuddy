@@ -39,9 +39,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 
 //        Parceiro parceiro1 = Parceiro.builder().nomeFantasia("Amazon").cnpj("38345431000162").dataEntrada(LocalDate.now()).build();
 //        Parceiro parceiro2 = Parceiro.builder().nomeFantasia("Mercado Livre").cnpj("27303425000126").dataEntrada(LocalDate.now()).build();
-        // Parceiro parceiro3 = Parceiro.builder().nomeFantasia("nome3").cnpj("cnpj3").dataEntrada(LocalDate.now()).build();
-        // Parceiro parceiro4 = Parceiro.builder().nomeFantasia("nome4").cnpj("cnpj4").dataEntrada(LocalDate.now()).build();
-
+//
 //        parceiroRepository.deleteAll();
 //        parceiroRepository.saveAll(List.of(
 //                parceiro1, parceiro2
@@ -51,7 +49,7 @@ public class DatabaseSeeder implements CommandLineRunner {
 //                Funcionario.builder().nome("Yago Leandro Martin Lima").email("yago-lima87@doublemoore.com").senha(encoder.encode("CatGlRIxYm")).parceiro(parceiro1).build(),
 //                Funcionario.builder().nome("Stella Ayla Dias").email("stella.ayla.dias@helpvale.com.br").senha(encoder.encode("AYE3s0xku2")).parceiro(parceiro2).build()
 //        ));
-
+//
 //        usuarioRepository.deleteAll();
 //        usuarioRepository.saveAll(List.of(
 //                Usuario.builder().nome("Sandra Cristiane Sophie Monteiro").cep("97543160").cpf("19265516054").dataNascimento(LocalDate.now()).genero("F").build(),

@@ -30,7 +30,7 @@ public class ChatGPTService {
 
         String endpoint = "https://api.openai.com/v1/chat/completions";
 
-        String prompt = "Crie uma recomendação com menos de 500 caracteres, ";
+        String prompt = "Crie uma recomendação com menos de 200 caracteres, ";
 
         for (int i = 0; i < produtoList.size(); i++) {
             prompt = prompt +
@@ -40,7 +40,7 @@ public class ChatGPTService {
         prompt = prompt + " para "+usuario.getNome()+", o texto deve ser escrito de forma humana e animada, mostre autenticidade.";
 
         log.info(prompt);
-        String body = "{\"model\":\"gpt-3.5-turbo\",\"messages\":[{\"role\":\"system\",\"content\":\"Você é um especialista em recomendar produtos através de textos curtos com menos de 500 caracteres. Seus textos são felizes, simpáticos e entusiasmados\"},{\"role\":\"user\",\"content\":\"" + prompt + "\"}]}";
+        String body = "{\"model\":\"gpt-3.5-turbo\",\"messages\":[{\"role\":\"system\",\"content\":\"Você é um especialista em recomendar produtos através de textos curtos com menos de 200 caracteres. Seus textos são felizes, simpáticos e entusiasmados\"},{\"role\":\"user\",\"content\":\"" + prompt + "\"}]}";
         log.info(body);
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
