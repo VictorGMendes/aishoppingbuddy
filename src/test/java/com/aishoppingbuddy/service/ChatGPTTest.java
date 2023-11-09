@@ -32,32 +32,6 @@ public class ChatGPTTest {
     Logger log = LoggerFactory.getLogger(getClass());
 
     @Test
-    public void givenPrompt_whenSend_shouldReturnResult() throws IOException, InterruptedException {
-
-        String endpoint = "https://api.openai.com/v1/engines/davinci/completions";
-
-        String prompt = "Bom dia!";
-
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(endpoint))
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + apiKey)
-                .POST(HttpRequest.BodyPublishers.ofString("{\"prompt\":\"" + prompt + "\",\"max_tokens\":50}"))
-                .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        if (response.statusCode() == 200) {
-            String responseBody = response.body();
-            System.out.println("Response from ChatGPT: " + responseBody);
-        } else {
-            System.err.println("API request failed with status code: " + response.statusCode());
-            System.err.println("Error message: " + response.body());
-        }
-    }
-
-    @Test
     public void givenProdutoListAndUsuario_whenChatGPTService_shouldReturnMessage() throws IOException, InterruptedException {
 
         Parceiro parceiro1 = Parceiro.builder().nomeFantasia("Amazon").cnpj("38345431000162").dataEntrada(LocalDate.now()).build();
