@@ -26,6 +26,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -146,14 +148,13 @@ public class RecomendacaoController {
         recomendacao.setMensagem(mensagem);
         recomendacao.setData(LocalDate.now());
         primeiroProduto.ifPresent(produto -> recomendacao.setTitulo(produto.getNome()));
+        List<Produto> newList = new ArrayList<>();
         for (Produto produto:recomendacao.getProdutoList()) {
-            Produto produtoSalvo = produtoRepository.getReferenceById(produto.getId());
-            recomendacao.getProdutoList().remove(produto);
-            produtoSalvo.getRecomendacaoList().add(recomendacao);
-            recomendacao.getProdutoList().add(produtoSalvo);
+            var produtoSalvo = produtoRepository.findById(produto.getId()).orElseThrow();
+            newList.add(produtoSalvo);
             log.info("relacionando produto #"+produtoSalvo.getId()+" com a recomendacao criada");
         }
-
+        recomendacao.setProdutoList(newList);
         recomendacaoRepository.save(recomendacao);
         log.info("criada recomendacao: "+recomendacao.toString());
 

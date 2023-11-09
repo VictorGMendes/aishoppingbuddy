@@ -1,6 +1,6 @@
 package com.aishoppingbuddy.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,6 +13,7 @@ import java.util.List;
 @Builder
 @ToString
 @Entity(name = "t_aisb_recomendacao")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Recomendacao {
 
     @Id
@@ -34,8 +35,6 @@ public class Recomendacao {
             name = "possui",
             joinColumns = @JoinColumn(name = "cd_recomendacao"),
             inverseJoinColumns = @JoinColumn(name = "cd_produto"))
-    @ToString.Exclude
-    //@JsonIgnore
     private List<Produto> produtoList;
 
     @ManyToOne
