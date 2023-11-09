@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -95,8 +97,6 @@ public class RecomendacaoControllerTest {
         var token = createToken();
         log.info(token.token());
 
-        FakeValuesService fakeValuesService = new FakeValuesService(new Locale("pt-BR"), new RandomService());
-
         var pa1 = parceiroRepository.findById(1L)
                 .orElseThrow();
 
@@ -122,6 +122,292 @@ public class RecomendacaoControllerTest {
 
         assertEquals(200, response.getStatusCode().value());
         assertNotNull(found);
+
+    }
+
+    @Test
+    public void givenProdutosAndUsuario_whenGET_shouldReturnAll() throws Exception {
+
+        var token = createToken();
+        log.info(token.token());
+
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
+
+        Produto pr1 = Produto.builder().nome("Smartphone Galaxy S21").tipo("Eletrônico").categoria("Tecnologia").valor(999.99).descricao("Um smartphone de última geração com tela AMOLED de 6,2 polegadas, câmera de alta resolução e processador poderoso.").parceiro(pa1).build();
+        Produto pr2 = Produto.builder().nome("Livro: O Senhor dos Anéis").tipo("Livro").categoria("Literatura").valor(29.99).descricao("Uma obra épica de fantasia que narra a jornada de Frodo Baggins para destruir o Um Anel e salvar a Terra-média.").parceiro(pa1).build();
+        Produto pr3 = Produto.builder().nome("Bicicleta de Montanha").tipo("Esporte e Lazer").categoria("Aventura").valor(499.99).descricao("Uma bicicleta resistente projetada para trilhas off-road, com suspensão dianteira e pneus robustos para aventuras na natureza.").parceiro(pa1).recomendacaoList(List.of()).build();
+        Produto pr4 = Produto.builder().nome("Máquina de Café Expresso").tipo("Eletrodoméstico").categoria("Culinária").valor(199.99).descricao("Uma máquina de café automática que prepara café expresso delicioso com o toque de um botão, perfeita para os amantes de café.").parceiro(pa1).recomendacaoList(List.of()).build();
+        produtoRepository.saveAll(List.of(pr1,pr2,pr3,pr4));
+
+        Usuario u1 = Usuario.builder().nome("Sandra Cristiane Sophie Monteiro").cep("97543160").cpf("19265516054").dataNascimento(LocalDate.now()).genero("F").build();
+        Usuario u2 = Usuario.builder().nome("Mateus Iago Kaique Moreira").cep("64000390").cpf("79528133312").dataNascimento(LocalDate.now()).genero("M").build();
+        Usuario u3 = Usuario.builder().nome("Pietro Ian Barbosa").cep("66913260").cpf("35789752900").dataNascimento(LocalDate.now()).genero("M").build();
+        Usuario u4 = Usuario.builder().nome("Sara Julia Nair Barbosa").cep("65082585").cpf("38665570519").dataNascimento(LocalDate.now()).genero("F").build();
+        usuarioRepository.saveAll(List.of(u1,u2,u3,u4));
+
+        Recomendacao r1 = new Recomendacao();
+        r1.setProdutoList(List.of(pr1, pr2));
+        Recomendacao r2 = new Recomendacao();
+        r2.setProdutoList(List.of(pr1, pr3));
+        Recomendacao r3 = new Recomendacao();
+        r3.setProdutoList(List.of(pr3, pr2));
+        Recomendacao r4 = new Recomendacao();
+        r4.setProdutoList(List.of(pr4, pr2));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+token.token());
+        headers.set("Content-Type", "application/json");
+        
+        String baseUrl1 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u1.getId();
+        String requestBody1 = objectMapper.writeValueAsString(r1);
+        HttpEntity<String> requestEntity1 = new HttpEntity<>(requestBody1, headers);
+        ResponseEntity<String> response1 = restTemplate.exchange(baseUrl1, HttpMethod.POST, requestEntity1, String.class);
+
+        String baseUrl2 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u2.getId();
+        String requestBody2 = objectMapper.writeValueAsString(r2);
+        HttpEntity<String> requestEntity2 = new HttpEntity<>(requestBody2, headers);
+        ResponseEntity<String> response2 = restTemplate.exchange(baseUrl2, HttpMethod.POST, requestEntity2, String.class);
+
+        String baseUrl3 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u3.getId();
+        String requestBody3 = objectMapper.writeValueAsString(r3);
+        HttpEntity<String> requestEntity3 = new HttpEntity<>(requestBody3, headers);
+        ResponseEntity<String> response3 = restTemplate.exchange(baseUrl3, HttpMethod.POST, requestEntity3, String.class);
+
+        String baseUrl4 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u4.getId();
+        String requestBody4 = objectMapper.writeValueAsString(r4);
+        HttpEntity<String> requestEntity4 = new HttpEntity<>(requestBody4, headers);
+        ResponseEntity<String> response4 = restTemplate.exchange(baseUrl4, HttpMethod.POST, requestEntity4, String.class);
+
+        HttpHeaders headersGet = new HttpHeaders();
+        headersGet.set("Authorization", "Bearer "+token.token());
+        HttpEntity<String> requestEntityGet = new HttpEntity<>(headersGet);
+        String baseUrlGet = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao";
+        ResponseEntity<CustomPageImpl<Recomendacao>> responseGet = restTemplate.exchange(baseUrlGet, HttpMethod.GET, requestEntityGet, new ParameterizedTypeReference<CustomPageImpl<Recomendacao>>() {});
+
+        PageImpl<Recomendacao> page = responseGet.getBody();
+
+        assertEquals(200, response1.getStatusCode().value());
+        assertEquals(200, response2.getStatusCode().value());
+        assertEquals(200, response3.getStatusCode().value());
+        assertEquals(200, response4.getStatusCode().value());
+        assertEquals(200, responseGet.getStatusCode().value());
+        assertEquals(4,page.getContent().size());
+
+    }
+
+    @Test
+    public void givenProdutosAndUsuario_whenGETById_shouldReturnById() throws Exception {
+
+        var token = createToken();
+        log.info(token.token());
+
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
+
+        Produto pr1 = Produto.builder().nome("Smartphone Galaxy S21").tipo("Eletrônico").categoria("Tecnologia").valor(999.99).descricao("Um smartphone de última geração com tela AMOLED de 6,2 polegadas, câmera de alta resolução e processador poderoso.").parceiro(pa1).build();
+        Produto pr2 = Produto.builder().nome("Livro: O Senhor dos Anéis").tipo("Livro").categoria("Literatura").valor(29.99).descricao("Uma obra épica de fantasia que narra a jornada de Frodo Baggins para destruir o Um Anel e salvar a Terra-média.").parceiro(pa1).build();
+        Produto pr3 = Produto.builder().nome("Bicicleta de Montanha").tipo("Esporte e Lazer").categoria("Aventura").valor(499.99).descricao("Uma bicicleta resistente projetada para trilhas off-road, com suspensão dianteira e pneus robustos para aventuras na natureza.").parceiro(pa1).recomendacaoList(List.of()).build();
+        Produto pr4 = Produto.builder().nome("Máquina de Café Expresso").tipo("Eletrodoméstico").categoria("Culinária").valor(199.99).descricao("Uma máquina de café automática que prepara café expresso delicioso com o toque de um botão, perfeita para os amantes de café.").parceiro(pa1).recomendacaoList(List.of()).build();
+        produtoRepository.saveAll(List.of(pr1,pr2,pr3,pr4));
+
+        Usuario u1 = Usuario.builder().nome("Sandra Cristiane Sophie Monteiro").cep("97543160").cpf("19265516054").dataNascimento(LocalDate.now()).genero("F").build();
+        Usuario u2 = Usuario.builder().nome("Mateus Iago Kaique Moreira").cep("64000390").cpf("79528133312").dataNascimento(LocalDate.now()).genero("M").build();
+        Usuario u3 = Usuario.builder().nome("Pietro Ian Barbosa").cep("66913260").cpf("35789752900").dataNascimento(LocalDate.now()).genero("M").build();
+        Usuario u4 = Usuario.builder().nome("Sara Julia Nair Barbosa").cep("65082585").cpf("38665570519").dataNascimento(LocalDate.now()).genero("F").build();
+        usuarioRepository.saveAll(List.of(u1,u2,u3,u4));
+
+        Recomendacao r1 = new Recomendacao();
+        r1.setProdutoList(List.of(pr1, pr2));
+        Recomendacao r2 = new Recomendacao();
+        r2.setProdutoList(List.of(pr1, pr3));
+        Recomendacao r3 = new Recomendacao();
+        r3.setProdutoList(List.of(pr3, pr2));
+        Recomendacao r4 = new Recomendacao();
+        r4.setProdutoList(List.of(pr4, pr2));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+token.token());
+        headers.set("Content-Type", "application/json");
+
+        String baseUrl1 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u1.getId();
+        String requestBody1 = objectMapper.writeValueAsString(r1);
+        HttpEntity<String> requestEntity1 = new HttpEntity<>(requestBody1, headers);
+        ResponseEntity<String> response1 = restTemplate.exchange(baseUrl1, HttpMethod.POST, requestEntity1, String.class);
+
+        String baseUrl2 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u2.getId();
+        String requestBody2 = objectMapper.writeValueAsString(r2);
+        HttpEntity<String> requestEntity2 = new HttpEntity<>(requestBody2, headers);
+        ResponseEntity<String> response2 = restTemplate.exchange(baseUrl2, HttpMethod.POST, requestEntity2, String.class);
+
+        String baseUrl3 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u3.getId();
+        String requestBody3 = objectMapper.writeValueAsString(r3);
+        HttpEntity<String> requestEntity3 = new HttpEntity<>(requestBody3, headers);
+        ResponseEntity<String> response3 = restTemplate.exchange(baseUrl3, HttpMethod.POST, requestEntity3, String.class);
+
+        String baseUrl4 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u4.getId();
+        String requestBody4 = objectMapper.writeValueAsString(r4);
+        HttpEntity<String> requestEntity4 = new HttpEntity<>(requestBody4, headers);
+        ResponseEntity<String> response4 = restTemplate.exchange(baseUrl4, HttpMethod.POST, requestEntity4, String.class);
+
+        HttpHeaders headersGet = new HttpHeaders();
+        headersGet.set("Authorization", "Bearer "+token.token());
+        HttpEntity<String> requestEntityGet = new HttpEntity<>(headersGet);
+        String baseUrlGet = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/2";
+        ResponseEntity<String> responseGet = restTemplate.exchange(baseUrlGet, HttpMethod.GET, requestEntityGet, String.class);
+
+        log.info(responseGet.getBody());
+
+        assertEquals(200, response1.getStatusCode().value());
+        assertEquals(200, response2.getStatusCode().value());
+        assertEquals(200, response3.getStatusCode().value());
+        assertEquals(200, response4.getStatusCode().value());
+        assertEquals(200, responseGet.getStatusCode().value());
+        assertNotNull(responseGet.getBody());
+
+    }
+
+    @Test
+    public void givenProdutosAndUsuario_whenGETWithSearch_shouldReturnFromSearch() throws Exception {
+
+        var token = createToken();
+        log.info(token.token());
+
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
+
+        Produto pr1 = Produto.builder().nome("Smartphone Galaxy S21").tipo("Eletrônico").categoria("Tecnologia").valor(999.99).descricao("Um smartphone de última geração com tela AMOLED de 6,2 polegadas, câmera de alta resolução e processador poderoso.").parceiro(pa1).build();
+        Produto pr2 = Produto.builder().nome("Livro: O Senhor dos Anéis").tipo("Livro").categoria("Literatura").valor(29.99).descricao("Uma obra épica de fantasia que narra a jornada de Frodo Baggins para destruir o Um Anel e salvar a Terra-média.").parceiro(pa1).build();
+        Produto pr3 = Produto.builder().nome("Bicicleta de Montanha").tipo("Esporte e Lazer").categoria("Aventura").valor(499.99).descricao("Uma bicicleta resistente projetada para trilhas off-road, com suspensão dianteira e pneus robustos para aventuras na natureza.").parceiro(pa1).recomendacaoList(List.of()).build();
+        Produto pr4 = Produto.builder().nome("Máquina de Café Expresso").tipo("Eletrodoméstico").categoria("Culinária").valor(199.99).descricao("Uma máquina de café automática que prepara café expresso delicioso com o toque de um botão, perfeita para os amantes de café.").parceiro(pa1).recomendacaoList(List.of()).build();
+        produtoRepository.saveAll(List.of(pr1,pr2,pr3,pr4));
+
+        Usuario u1 = Usuario.builder().nome("Sandra Cristiane Sophie Monteiro").cep("97543160").cpf("19265516054").dataNascimento(LocalDate.now()).genero("F").build();
+        Usuario u2 = Usuario.builder().nome("Mateus Iago Kaique Moreira").cep("64000390").cpf("79528133312").dataNascimento(LocalDate.now()).genero("M").build();
+        Usuario u3 = Usuario.builder().nome("Pietro Ian Barbosa").cep("66913260").cpf("35789752900").dataNascimento(LocalDate.now()).genero("M").build();
+        Usuario u4 = Usuario.builder().nome("Sara Julia Nair Barbosa").cep("65082585").cpf("38665570519").dataNascimento(LocalDate.now()).genero("F").build();
+        usuarioRepository.saveAll(List.of(u1,u2,u3,u4));
+
+        Recomendacao r1 = new Recomendacao();
+        r1.setProdutoList(List.of(pr1, pr2));
+        Recomendacao r2 = new Recomendacao();
+        r2.setProdutoList(List.of(pr1, pr3));
+        Recomendacao r3 = new Recomendacao();
+        r3.setProdutoList(List.of(pr3, pr2));
+        Recomendacao r4 = new Recomendacao();
+        r4.setProdutoList(List.of(pr4, pr2));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+token.token());
+        headers.set("Content-Type", "application/json");
+
+        String baseUrl1 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u1.getId();
+        String requestBody1 = objectMapper.writeValueAsString(r1);
+        HttpEntity<String> requestEntity1 = new HttpEntity<>(requestBody1, headers);
+        ResponseEntity<String> response1 = restTemplate.exchange(baseUrl1, HttpMethod.POST, requestEntity1, String.class);
+
+        String baseUrl2 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u2.getId();
+        String requestBody2 = objectMapper.writeValueAsString(r2);
+        HttpEntity<String> requestEntity2 = new HttpEntity<>(requestBody2, headers);
+        ResponseEntity<String> response2 = restTemplate.exchange(baseUrl2, HttpMethod.POST, requestEntity2, String.class);
+
+        String baseUrl3 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u3.getId();
+        String requestBody3 = objectMapper.writeValueAsString(r3);
+        HttpEntity<String> requestEntity3 = new HttpEntity<>(requestBody3, headers);
+        ResponseEntity<String> response3 = restTemplate.exchange(baseUrl3, HttpMethod.POST, requestEntity3, String.class);
+
+        String baseUrl4 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u4.getId();
+        String requestBody4 = objectMapper.writeValueAsString(r4);
+        HttpEntity<String> requestEntity4 = new HttpEntity<>(requestBody4, headers);
+        ResponseEntity<String> response4 = restTemplate.exchange(baseUrl4, HttpMethod.POST, requestEntity4, String.class);
+
+        HttpHeaders headersGet = new HttpHeaders();
+        headersGet.set("Authorization", "Bearer "+token.token());
+        HttpEntity<String> requestEntityGet = new HttpEntity<>(headersGet);
+        String baseUrlGet = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/busca/Smartphone";
+        ResponseEntity<CustomPageImpl<Recomendacao>> responseGet = restTemplate.exchange(baseUrlGet, HttpMethod.GET, requestEntityGet, new ParameterizedTypeReference<CustomPageImpl<Recomendacao>>() {});
+
+        PageImpl<Recomendacao> page = responseGet.getBody();
+        log.info(page.getContent().toString());
+
+        assertEquals(200, response1.getStatusCode().value());
+        assertEquals(200, response2.getStatusCode().value());
+        assertEquals(200, response3.getStatusCode().value());
+        assertEquals(200, response4.getStatusCode().value());
+        assertEquals(200, responseGet.getStatusCode().value());
+        assertEquals(2,page.getContent().size());
+
+    }
+
+    @Test
+    public void givenProdutosAndUsuario_whenGETWithUsuarioId_shouldReturnFromId() throws Exception {
+
+        var token = createToken();
+        log.info(token.token());
+
+        var pa1 = parceiroRepository.findById(1L)
+                .orElseThrow();
+
+        Produto pr1 = Produto.builder().nome("Smartphone Galaxy S21").tipo("Eletrônico").categoria("Tecnologia").valor(999.99).descricao("Um smartphone de última geração com tela AMOLED de 6,2 polegadas, câmera de alta resolução e processador poderoso.").parceiro(pa1).build();
+        Produto pr2 = Produto.builder().nome("Livro: O Senhor dos Anéis").tipo("Livro").categoria("Literatura").valor(29.99).descricao("Uma obra épica de fantasia que narra a jornada de Frodo Baggins para destruir o Um Anel e salvar a Terra-média.").parceiro(pa1).build();
+        Produto pr3 = Produto.builder().nome("Bicicleta de Montanha").tipo("Esporte e Lazer").categoria("Aventura").valor(499.99).descricao("Uma bicicleta resistente projetada para trilhas off-road, com suspensão dianteira e pneus robustos para aventuras na natureza.").parceiro(pa1).recomendacaoList(List.of()).build();
+        Produto pr4 = Produto.builder().nome("Máquina de Café Expresso").tipo("Eletrodoméstico").categoria("Culinária").valor(199.99).descricao("Uma máquina de café automática que prepara café expresso delicioso com o toque de um botão, perfeita para os amantes de café.").parceiro(pa1).recomendacaoList(List.of()).build();
+        produtoRepository.saveAll(List.of(pr1,pr2,pr3,pr4));
+
+        Usuario u1 = Usuario.builder().nome("Sandra Cristiane Sophie Monteiro").cep("97543160").cpf("19265516054").dataNascimento(LocalDate.now()).genero("F").build();
+        Usuario u2 = Usuario.builder().nome("Mateus Iago Kaique Moreira").cep("64000390").cpf("79528133312").dataNascimento(LocalDate.now()).genero("M").build();
+        Usuario u3 = Usuario.builder().nome("Pietro Ian Barbosa").cep("66913260").cpf("35789752900").dataNascimento(LocalDate.now()).genero("M").build();
+        Usuario u4 = Usuario.builder().nome("Sara Julia Nair Barbosa").cep("65082585").cpf("38665570519").dataNascimento(LocalDate.now()).genero("F").build();
+        usuarioRepository.saveAll(List.of(u1,u2,u3,u4));
+
+        Recomendacao r1 = new Recomendacao();
+        r1.setProdutoList(List.of(pr1, pr2));
+        Recomendacao r2 = new Recomendacao();
+        r2.setProdutoList(List.of(pr1, pr3));
+        Recomendacao r3 = new Recomendacao();
+        r3.setProdutoList(List.of(pr3, pr2));
+        Recomendacao r4 = new Recomendacao();
+        r4.setProdutoList(List.of(pr4, pr2));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer "+token.token());
+        headers.set("Content-Type", "application/json");
+
+        String baseUrl1 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u1.getId();
+        String requestBody1 = objectMapper.writeValueAsString(r1);
+        HttpEntity<String> requestEntity1 = new HttpEntity<>(requestBody1, headers);
+        ResponseEntity<String> response1 = restTemplate.exchange(baseUrl1, HttpMethod.POST, requestEntity1, String.class);
+
+        String baseUrl2 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u2.getId();
+        String requestBody2 = objectMapper.writeValueAsString(r2);
+        HttpEntity<String> requestEntity2 = new HttpEntity<>(requestBody2, headers);
+        ResponseEntity<String> response2 = restTemplate.exchange(baseUrl2, HttpMethod.POST, requestEntity2, String.class);
+
+        String baseUrl3 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u3.getId();
+        String requestBody3 = objectMapper.writeValueAsString(r3);
+        HttpEntity<String> requestEntity3 = new HttpEntity<>(requestBody3, headers);
+        ResponseEntity<String> response3 = restTemplate.exchange(baseUrl3, HttpMethod.POST, requestEntity3, String.class);
+
+        String baseUrl4 = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/"+u4.getId();
+        String requestBody4 = objectMapper.writeValueAsString(r4);
+        HttpEntity<String> requestEntity4 = new HttpEntity<>(requestBody4, headers);
+        ResponseEntity<String> response4 = restTemplate.exchange(baseUrl4, HttpMethod.POST, requestEntity4, String.class);
+
+        HttpHeaders headersGet = new HttpHeaders();
+        headersGet.set("Authorization", "Bearer "+token.token());
+        HttpEntity<String> requestEntityGet = new HttpEntity<>(headersGet);
+        String baseUrlGet = "http://localhost:" + port + "/aishoppingbuddy/api/recomendacao/usuario/3";
+        ResponseEntity<CustomPageImpl<Recomendacao>> responseGet = restTemplate.exchange(baseUrlGet, HttpMethod.GET, requestEntityGet, new ParameterizedTypeReference<CustomPageImpl<Recomendacao>>() {});
+
+        PageImpl<Recomendacao> page = responseGet.getBody();
+        log.info(page.getContent().toString());
+
+        assertEquals(200, response1.getStatusCode().value());
+        assertEquals(200, response2.getStatusCode().value());
+        assertEquals(200, response3.getStatusCode().value());
+        assertEquals(200, response4.getStatusCode().value());
+        assertEquals(200, responseGet.getStatusCode().value());
+        assertEquals(1,page.getContent().size());
 
     }
 
