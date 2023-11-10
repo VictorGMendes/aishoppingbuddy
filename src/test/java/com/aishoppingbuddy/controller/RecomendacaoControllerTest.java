@@ -92,6 +92,14 @@ public class RecomendacaoControllerTest {
     }
 
     @Test
+    // # Testa a criação de uma recomendação
+    // — Cria o token com createToken()
+    // — Cria alguns produtos
+    // — Cria alguns usuários
+    // — Cria a recomendação com apenas uma lista de produtos
+    // — Faz a chamada na API do ChatGPT para criar a mensagem
+    // — Verifica se o código foi 200
+    // — Verifica se a recomendação foi criada
     public void givenProdutosAndUsuario_whenPOST_shouldCreateRecomendacao() throws Exception {
 
         var token = createToken();
@@ -126,6 +134,16 @@ public class RecomendacaoControllerTest {
     }
 
     @Test
+    // # Testa o GET
+    // — Cria o token com createToken()
+    // — Cria alguns produtos
+    // — Cria alguns usuários
+    // — Cria algumas recomendações com apenas uma lista de produtos
+    // — Faz a chamada na API do ChatGPT para criar as mensagens pra cada recomendação
+    // — Faz a chamada na API para retornar todas recomendações da pesquisa
+    // — Verifica se os códigos foram 200
+    // — Verifica se as recomendações foram criadas
+    // — Verifica se o retorno possuí 4 elementos
     public void givenProdutosAndUsuario_whenGET_shouldReturnAll() throws Exception {
 
         var token = createToken();
@@ -197,6 +215,16 @@ public class RecomendacaoControllerTest {
     }
 
     @Test
+    // # Testa o GET por ID
+    // — Cria o token com createToken()
+    // — Cria alguns produtos
+    // — Cria alguns usuários
+    // — Cria algumas recomendações com apenas uma lista de produtos
+    // — Faz a chamada na API do ChatGPT para criar as mensagens pra cada recomendação
+    // — Faz a chamada na API para retornar a recomendação por ID
+    // — Verifica se os códigos foram 200
+    // — Verifica se as recomendações foram criadas
+    // — Verifica se o retorno não foi nulo
     public void givenProdutosAndUsuario_whenGETById_shouldReturnById() throws Exception {
 
         var token = createToken();
@@ -268,6 +296,16 @@ public class RecomendacaoControllerTest {
     }
 
     @Test
+    // # Testa o GET por pesquisa
+    // — Cria o token com createToken()
+    // — Cria alguns produtos
+    // — Cria alguns usuários
+    // — Cria algumas recomendações com apenas uma lista de produtos
+    // — Faz a chamada na API do ChatGPT para criar as mensagens pra cada recomendação
+    // — Faz a chamada na API para retornar todas recomendações pela pesquisa
+    // — Verifica se os códigos foram 200
+    // — Verifica se as recomendações foram criadas
+    // — Verifica se o retorno possuí 2 elementos
     public void givenProdutosAndUsuario_whenGETWithSearch_shouldReturnFromSearch() throws Exception {
 
         var token = createToken();
@@ -340,7 +378,17 @@ public class RecomendacaoControllerTest {
     }
 
     @Test
-    public void givenProdutosAndUsuario_whenGETWithUsuarioId_shouldReturnFromId() throws Exception {
+    // # Testa o GET por pesquisa
+    // — Cria o token com createToken()
+    // — Cria alguns produtos
+    // — Cria alguns usuários
+    // — Cria algumas recomendações com apenas uma lista de produtos
+    // — Faz a chamada na API do ChatGPT para criar as mensagens pra cada recomendação
+    // — Faz a chamada na API para retornar todas recomendações do usuário
+    // — Verifica se os códigos foram 200
+    // — Verifica se as recomendações foram criadas
+    // — Verifica se o retorno possuí 1 elementos
+    public void givenProdutosAndUsuario_whenGETWithUsuarioId_shouldReturnFromUsuarioId() throws Exception {
 
         var token = createToken();
         log.info(token.token());
