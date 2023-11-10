@@ -367,9 +367,9 @@ public class ProdutoControllerTest {
     // — Cria o token com createToken()
     // — Cria um produto
     // — Cria outro produto com dados diferentes sem salvar no banco
-    // — Faz a chamada PUT na API com ID:2 e com corpo do outro produto
-    // — Verifica se o código foi 204
-    // — Verifica se os dados do produto de ID:2 são os dados atualizados
+    // — Faz a chamada PUT na API com ID:1 e com corpo do outro produto
+    // — Verifica se o código foi 200
+    // — Verifica se os dados do produto de ID:1 são os dados atualizados
     public void givenProduto_whenPutId_shouldUpdateById() throws Exception {
         var token = createToken();
         log.info(token.token());

@@ -339,6 +339,13 @@ public class UsuarioControllerTest {
     }
 
     @Test
+    // # Testa o PUT por ID
+    // — Cria o token com createToken()
+    // — Cria um usuario
+    // — Cria outro usuario com dados diferentes sem salvar no banco
+    // — Faz a chamada PUT na API com ID:1 e com corpo do outro usuario
+    // — Verifica se o código foi 200
+    // — Verifica se os dados do usuario de ID:1 são os dados atualizados
     public void givenUsuario_whenPutId_shouldUpdateById() throws Exception {
         var token = createToken();
         log.info(token.token());

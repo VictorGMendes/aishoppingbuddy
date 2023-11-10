@@ -399,7 +399,7 @@ public class FuncionarioControllerTest {
     // — Cria um funcionário
     // — Cria outro funcionário com dados diferentes sem salvar no banco
     // — Faz a chamada PUT na API com ID:2 e com corpo do outro funcionário
-    // — Verifica se o código foi 204
+    // — Verifica se o código foi 200
     // — Verifica se os dados do funcionário de ID:2 são os dados atualizados
     public void givenFuncionario_whenPutFuncionarioById_shouldUpdateById() throws Exception {
         var token = createToken();

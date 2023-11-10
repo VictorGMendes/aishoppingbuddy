@@ -317,7 +317,7 @@ public class ParceiroControllerTest {
     // — Cria um parceiro
     // — Cria outro parceiro com dados diferentes sem salvar no banco
     // — Faz a chamada PUT na API com ID:2 e com corpo do outro parceiro
-    // — Verifica se o código foi 204
+    // — Verifica se o código foi 200
     // — Verifica se os dados do pareceiro de ID:2 são os dados atualizados
     public void givenParceiro_whenPutId_shouldUpdateById() throws Exception {
         var token = createToken();
