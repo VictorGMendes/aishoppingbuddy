@@ -84,6 +84,12 @@ public class UsuarioControllerTest {
     }
 
     @Test
+    // # Testa o GET
+    // — Cria o token com createToken()
+    // — Cria alguns usuários diferentes
+    // — Faz a chamada GET na API
+    // — Verifica se o código foi 200
+    // — Verifica se o retorno possuí 4 elementos
     public void givenUsuarios_whenGet_shouldReturnAllUsuariosFromParceiroOfToken() throws Exception {
 
         var token = createToken();
@@ -151,6 +157,12 @@ public class UsuarioControllerTest {
     }
 
     @Test
+    // # Testa o GET por ID
+    // — Cria o token com createToken()
+    // — Cria alguns produtos diferentes
+    // — Faz a chamada GET na API com ID:2
+    // — Verifica se o código foi 200
+    // — Verifica se os dados retorno são os mesmos do usuário de ID:2
     public void givenUsuarios_whenGetById_shouldReturnUsuarioById() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -217,6 +229,12 @@ public class UsuarioControllerTest {
     }
 
     @Test
+    // # Testa cadastro de um Usuário
+    // — Cria o token com createToken()
+    // — Cria um produto
+    // — Faz a chamada na API para cadastrar
+    // — Verifica se o código foi 201
+    // — Verifica se o usuário cadastrado possuí os dados enviados
     public void givenUsuario_whenPost_shouldBeCreated() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -251,6 +269,12 @@ public class UsuarioControllerTest {
     }
 
     @Test
+    // # Testa o DELETE por ID
+    // — Cria o token com createToken()
+    // — Cria alguns produtos diferentes
+    // — Faz a chamada DELETE na API com ID:3
+    // — Verifica se o código foi 204
+    // — Verifica se o produto de ID:2 não existe no banco
     public void givenUsuarios_whenDeleteById_shouldBeRemovedById() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -315,6 +339,13 @@ public class UsuarioControllerTest {
     }
 
     @Test
+    // # Testa o PUT por ID
+    // — Cria o token com createToken()
+    // — Cria um usuario
+    // — Cria outro usuario com dados diferentes sem salvar no banco
+    // — Faz a chamada PUT na API com ID:1 e com corpo do outro usuario
+    // — Verifica se o código foi 200
+    // — Verifica se os dados do usuario de ID:1 são os dados atualizados
     public void givenUsuario_whenPutId_shouldUpdateById() throws Exception {
         var token = createToken();
         log.info(token.token());

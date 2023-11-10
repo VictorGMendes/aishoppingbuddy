@@ -140,12 +140,8 @@ public class RecomendacaoController {
 
         Optional<Produto> primeiroProduto = produtoRepository.findById(recomendacao.getProdutoList().get(0).getId());
 
-        log.info("gerando mensagem da recomendacao");
-        String mensagem = chatGPTService.generateMessage(recomendacao.getProdutoList(),usuarioResult);
-
         recomendacao.setParceiro(parceiroResult);
         recomendacao.setUsuario(usuarioResult);
-        recomendacao.setMensagem(mensagem);
         recomendacao.setData(LocalDate.now());
         primeiroProduto.ifPresent(produto -> recomendacao.setTitulo(produto.getNome()));
         List<Produto> newList = new ArrayList<>();
@@ -155,6 +151,10 @@ public class RecomendacaoController {
             log.info("relacionando produto #"+produtoSalvo.getId()+" com a recomendacao criada");
         }
         recomendacao.setProdutoList(newList);
+        log.info("lista de produtos salva na recomendação");
+        log.info("gerando mensagem da recomendacao");
+        String mensagem = chatGPTService.generateMessage(recomendacao.getProdutoList(),usuarioResult);
+        recomendacao.setMensagem(mensagem);
         recomendacaoRepository.save(recomendacao);
         log.info("criada recomendacao: "+recomendacao.toString());
 

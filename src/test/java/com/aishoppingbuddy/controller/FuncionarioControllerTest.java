@@ -252,7 +252,7 @@ public class FuncionarioControllerTest {
     // — Cria alguns funcionários de parceiros diferentes
     // — Faz a chamada GET na API com ID:3
     // — Verifica se o código foi 200
-    // — Verifica se o retorno é o funcionário de ID:5
+    // — Verifica se o retorno é o funcionário de ID:3
     public void givenFuncionarios_whenGetById_shouldReturnById() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -399,7 +399,7 @@ public class FuncionarioControllerTest {
     // — Cria um funcionário
     // — Cria outro funcionário com dados diferentes sem salvar no banco
     // — Faz a chamada PUT na API com ID:2 e com corpo do outro funcionário
-    // — Verifica se o código foi 204
+    // — Verifica se o código foi 200
     // — Verifica se os dados do funcionário de ID:2 são os dados atualizados
     public void givenFuncionario_whenPutFuncionarioById_shouldUpdateById() throws Exception {
         var token = createToken();

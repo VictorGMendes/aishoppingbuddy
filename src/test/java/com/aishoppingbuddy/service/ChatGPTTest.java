@@ -32,6 +32,12 @@ public class ChatGPTTest {
     Logger log = LoggerFactory.getLogger(getClass());
 
     @Test
+    // # Testa o generateMessage()
+    // Cria um parceiro
+    // Cria um usuário
+    // Cria alguns produtos
+    // Gera a mensagem com o generateMessage()
+    // Verifica se a mensagem não é nula
     public void givenProdutoListAndUsuario_whenChatGPTService_shouldReturnMessage() throws IOException, InterruptedException {
 
         Parceiro parceiro1 = Parceiro.builder().nomeFantasia("Amazon").cnpj("38345431000162").dataEntrada(LocalDate.now()).build();

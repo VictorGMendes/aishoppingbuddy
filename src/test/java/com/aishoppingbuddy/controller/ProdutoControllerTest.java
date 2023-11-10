@@ -82,6 +82,12 @@ public class ProdutoControllerTest {
     }
 
     @Test
+    // # Testa o GET
+    // — Cria o token com createToken()
+    // — Cria alguns produtos de parceiros diferentes
+    // — Faz a chamada GET na API
+    // — Verifica se o código foi 200
+    // — Verifica se o retorno possuí 2 elementos
     public void givenProdutos_whenGet_shouldReturnAllProdutosFromParceiroOfToken() throws Exception {
 
         var token = createToken();
@@ -156,6 +162,12 @@ public class ProdutoControllerTest {
     }
 
     @Test
+    // # Testa o GET por ID
+    // — Cria o token com createToken()
+    // — Cria alguns produtos diferentes
+    // — Faz a chamada GET na API com ID:2
+    // — Verifica se o código foi 200
+    // — Verifica se os dados retorno são os mesmos do produto de ID:2
     public void givenProdutos_whenGetById_shouldReturnProdutoById() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -234,6 +246,12 @@ public class ProdutoControllerTest {
     }
 
     @Test
+    // # Testa cadastro de um Produto
+    // — Cria o token com createToken()
+    // — Cria um produto
+    // — Faz a chamada na API para cadastrar
+    // — Verifica se o código foi 201
+    // — Verifica se o produto cadastrado possuí os dados enviados
     public void givenProduto_whenPost_shouldBeCreated() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -268,6 +286,12 @@ public class ProdutoControllerTest {
     }
 
     @Test
+    // # Testa o DELETE por ID
+    // — Cria o token com createToken()
+    // — Cria alguns produtos diferentes
+    // — Faz a chamada DELETE na API com ID:3
+    // — Verifica se o código foi 204
+    // — Verifica se o produto de ID:3 não existe no banco
     public void givenProdutos_whenDeleteById_shouldBeRemovedById() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -339,6 +363,13 @@ public class ProdutoControllerTest {
     }
 
     @Test
+    // # Testa o PUT por ID
+    // — Cria o token com createToken()
+    // — Cria um produto
+    // — Cria outro produto com dados diferentes sem salvar no banco
+    // — Faz a chamada PUT na API com ID:1 e com corpo do outro produto
+    // — Verifica se o código foi 200
+    // — Verifica se os dados do produto de ID:1 são os dados atualizados
     public void givenProduto_whenPutId_shouldUpdateById() throws Exception {
         var token = createToken();
         log.info(token.token());

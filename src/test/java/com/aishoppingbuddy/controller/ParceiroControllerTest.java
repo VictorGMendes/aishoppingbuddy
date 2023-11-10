@@ -80,6 +80,12 @@ public class ParceiroControllerTest {
     }
     
     @Test
+    // # Testa o GET
+    // — Cria o token com createToken()
+    // — Cria alguns parceiros diferentes
+    // — Faz a chamada GET na API
+    // — Verifica se o código foi 200
+    // — Verifica se o retorno possuí 5 elementos
     public void givenParceiros_whenGet_shouldReturnAllParceiros() throws Exception {
 
         var token = createToken();
@@ -144,6 +150,12 @@ public class ParceiroControllerTest {
     }
 
     @Test
+    // # Testa o GET por ID
+    // — Cria o token com createToken()
+    // — Cria alguns parceiros diferentes
+    // — Faz a chamada GET na API com ID:3
+    // — Verifica se o código foi 200
+    // — Verifica se o retorno é o parceiro de ID:3
     public void givenParceiros_whenGetById_shouldReturnParceiroById() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -204,6 +216,12 @@ public class ParceiroControllerTest {
     }
 
     @Test
+    // # Testa cadastro de um Parceiro
+    // — Cria o token com createToken()
+    // — Cria um parceiro
+    // — Faz a chamada na API para cadastrar
+    // — Verifica se o código foi 201
+    // — Verifica se o parceiro cadastrado possuí os dados enviados
     public void givenParceiro_whenPost_shouldBeCreated() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -230,6 +248,12 @@ public class ParceiroControllerTest {
     }
 
     @Test
+    // # Testa o DELETE por ID
+    // — Cria o token com createToken()
+    // — Cria alguns parceiros diferentes
+    // — Faz a chamada DELETE na API com ID:3
+    // — Verifica se o código foi 204
+    // — Verifica se o parceiro de ID:3 não existe no banco
     public void givenParceiro_whenDeleteById_shouldBeRemoved() throws Exception {
         var token = createToken();
         log.info(token.token());
@@ -288,6 +312,13 @@ public class ParceiroControllerTest {
     }
 
     @Test
+    // # Testa o PUT por ID
+    // — Cria o token com createToken()
+    // — Cria um parceiro
+    // — Cria outro parceiro com dados diferentes sem salvar no banco
+    // — Faz a chamada PUT na API com ID:2 e com corpo do outro parceiro
+    // — Verifica se o código foi 200
+    // — Verifica se os dados do pareceiro de ID:2 são os dados atualizados
     public void givenParceiro_whenPutId_shouldUpdateById() throws Exception {
         var token = createToken();
         log.info(token.token());
